@@ -1,4 +1,5 @@
 package com.github.gerdreiss
+package learningscala3
 
 object Enums:
 
