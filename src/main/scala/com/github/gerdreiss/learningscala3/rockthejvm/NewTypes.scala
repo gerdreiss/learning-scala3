@@ -1,4 +1,6 @@
-package com.github.gerdreiss.learningscala3
+package com.github.gerdreiss
+package learningscala3
+package rockthejvm
 
 import java.io.File
 
