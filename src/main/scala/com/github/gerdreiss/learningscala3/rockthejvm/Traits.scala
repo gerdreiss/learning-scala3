@@ -17,14 +17,14 @@ object Traits:
 
   class AnnoyingFriend extends BrokenRecord with Talker("Politics")
 
-  // super traits
-  trait Paintable
-  trait Color
-  case object Red   extends Color with Paintable
-  case object Green extends Color with Paintable
-  case object Blue  extends Color with Paintable
+// super traits
+// super trait Paintable
+// trait Color
+// case object Red   extends Color with Paintable
+// case object Green extends Color with Paintable
+// case object Blue  extends Color with Paintable
 
-  val color = if (42 > 2) Red else Blue
+// val color = if (42 > 2) Red else Blue
 
 /*
  * super trait examples:

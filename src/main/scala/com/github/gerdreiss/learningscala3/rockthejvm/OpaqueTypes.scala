@@ -22,7 +22,7 @@ object OpaqueTypes extends App:
     extension (n: Name)
         def length: Int = n.length
 
-  import SocialNetwork._
+  import SocialNetwork.*
 
   // outside of scope, Name != String
   // val name: Name = "G" // does not compile
@@ -41,7 +41,7 @@ object OpaqueTypes extends App:
       val Blue: Color = 0x0000FF00
       val halfTransparency: ColorFilter = 0x88 // 50% transparency
 
-  import Graphics._
+  import Graphics.*
 
   case class OverlayFilter(c: Color)
 

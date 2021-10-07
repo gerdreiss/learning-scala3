@@ -1,17 +1,19 @@
 import Dependencies._
 
-ThisBuild / organization := "com.github.gerdreiss"
-ThisBuild / scalaVersion := "3.0.0-M1"
-ThisBuild / version := "0.0.1-SNAPSHOT"
+ThisBuild / organization := "dev.insideyou"
+ThisBuild / scalaVersion := "3.0.2"
 
 ThisBuild / scalacOptions ++=
-  Seq("-rewrite", "-indent") ++ Seq(
+  Seq(
     "-deprecation",
     "-feature",
     "-language:implicitConversions",
     "-unchecked",
-    "-Xfatal-warnings"
-  )
+    "-Xfatal-warnings",
+    "-Yexplicit-nulls", // experimental (I've seen it cause issues with circe)
+    "-Ykind-projector",
+    "-Ysafe-init"       // experimental (I've seen it cause issues with circe)
+  ) ++ Seq("-rewrite", "-indent") ++ Seq("-source", "future")
 
 lazy val `learning-scala3` =
   project
@@ -20,8 +22,11 @@ lazy val `learning-scala3` =
     .settings(commonSettings)
     .settings(dependencies)
 
-lazy val commonSettings = Seq(
-  update / evictionWarningOptions := EvictionWarningOptions.empty,
+lazy val commonSettings = commonScalacOptions ++ Seq(
+  update / evictionWarningOptions := EvictionWarningOptions.empty
+)
+
+lazy val commonScalacOptions = Seq(
   Compile / console / scalacOptions --= Seq(
     "-Wunused:_",
     "-Xfatal-warnings"
@@ -36,6 +41,6 @@ lazy val dependencies = Seq(
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,
-    org.scalatestplus.`scalacheck-1-14`
+    org.scalatestplus.`scalacheck-1-15`
   ).map(_ % Test)
 )
