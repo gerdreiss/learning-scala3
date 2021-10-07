@@ -1,11 +1,13 @@
 package com.github.gerdreiss
 package learningscala3
 
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
+import scala.language.adhocExtensions
 
 trait TestSuite
     extends AnyFunSuite
