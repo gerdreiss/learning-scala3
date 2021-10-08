@@ -80,35 +80,35 @@ object ValueClasses:
   BarCodeVC(UUID.randomUUID.toString) match
     case BarCodeVC(code) => println(code)
 
-// solution 3: newtype lib - solves all problems
-// For Scala 2:
-import io.estatico.newtype.macros.newtype
-import io.estatico.newtype.ops.*
-
-@newtype case class BarCodeNewtypeS2(code: String)
-
-object BarCodeNewtypeS2:
-  def make(code: String): Either[String, BarCodeNewtypeS2] =
-    Either.cond(
-      code.matches("""^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"""),
-      // code.coerce, <- for this to work, org.scalamacros:paradise compiler plugins is needed
-      BarCodeNewtypeS2(code),
-      "Invalid code"
-    )
-
-// For Scala 3 use opaque type
-opaque type BarCodeOpaque = String
-
-object BarCodeOpaque:
-  def make(code: String): Either[String, BarCodeOpaque] =
-    Either.cond(
-      code.matches("""^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"""),
-      code, // nothing else necessary - how cool is that?
-      "Invalid code"
-    )
-
-object Usage:
-  val barcodeString = UUID.randomUUID.toString
-  val barcode = BarCodeOpaque
-    .make(barcodeString)
-    .getOrElse(throw new java.lang.IllegalArgumentException("Invalid code"))
+  // solution 3: newtype lib - solves all problems
+  // For Scala 2:
+  import io.estatico.newtype.macros.newtype
+  import io.estatico.newtype.ops.*
+  
+  @newtype case class BarCodeNewtypeS2(code: String)
+  
+  object BarCodeNewtypeS2:
+    def make(code: String): Either[String, BarCodeNewtypeS2] =
+      Either.cond(
+        code.matches("""^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"""),
+        // code.coerce, <- for this to work, org.scalamacros:paradise compiler plugins is needed
+        BarCodeNewtypeS2(code),
+        "Invalid code"
+      )
+  
+  // For Scala 3 use opaque type
+  opaque type BarCodeOpaque = String
+  
+  object BarCodeOpaque:
+    def make(code: String): Either[String, BarCodeOpaque] =
+      Either.cond(
+        code.matches("""^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"""),
+        code, // nothing else necessary - how cool is that?
+        "Invalid code"
+      )
+  
+  object Usage:
+    val barcodeString = UUID.randomUUID.toString
+    val barcode = BarCodeOpaque
+      .make(barcodeString)
+      .getOrElse(throw new java.lang.IllegalArgumentException("Invalid code"))
