@@ -109,6 +109,6 @@ object BarCodeOpaque:
 
 object Usage:
   val barcodeString = UUID.randomUUID.toString
-  val barcode = BarCodeOpaque.make(barcodeString) match
-    case Right(code) => code
-    case _ => throw new java.lang.IllegalArgumentException("Invalid code")
+  val barcode = BarCodeOpaque
+    .make(barcodeString)
+    .getOrElse(throw new java.lang.IllegalArgumentException("Invalid code"))
