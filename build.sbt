@@ -1,6 +1,6 @@
 import Dependencies._
 
-ThisBuild / organization := "dev.insideyou"
+ThisBuild / organization := "com.github.gerdreiss"
 ThisBuild / scalaVersion := "3.0.2"
 
 ThisBuild / scalacOptions ++=
@@ -12,7 +12,7 @@ ThisBuild / scalacOptions ++=
     "-Xfatal-warnings",
     "-Yexplicit-nulls", // experimental (I've seen it cause issues with circe)
     "-Ykind-projector",
-    "-Ysafe-init"       // experimental (I've seen it cause issues with circe)
+    "-Ysafe-init" // experimental (I've seen it cause issues with circe)
   ) ++ Seq("-rewrite", "-indent") ++ Seq("-source", "future")
 
 lazy val `learning-scala3` =
@@ -37,7 +37,7 @@ lazy val commonScalacOptions = Seq(
 
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
-    // main dependencies
+    Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13)
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,
