@@ -18,5 +18,10 @@ object Dependencies {
       val `scalacheck-1-15` =
         "org.scalatestplus" %% "scalacheck-1-15" % "3.2.10.0"
     }
+
+    case object tpolecat {
+      val typename =
+        "org.tpolecat" %% "typename" % "1.0.0"
+    }
   }
 }

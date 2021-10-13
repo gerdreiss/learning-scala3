@@ -37,7 +37,8 @@ lazy val commonScalacOptions = Seq(
 
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
-    Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13)
+    Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13),
+    org.tpolecat.typename
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,
