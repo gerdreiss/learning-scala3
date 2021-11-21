@@ -3,8 +3,10 @@
 .bsp/
 .dotty-ide*
 .idea/
+.history/
 .metals/
 .vscode/
+out/
+target/
 *.worksheet.sc
 metals.sbt
-target/

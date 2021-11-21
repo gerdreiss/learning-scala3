@@ -1,7 +1,15 @@
 import sbt._
 
 object Dependencies {
-  case object io {
+  case object dev {
+    case object optics {
+      val `monocle-core` =
+        "dev.optics" %% "monocle-core" % "3.1.0"
+      val `monocle-macro` =
+        "dev.optics" %% "monocle-macro" % "3.1.0"
+    }
+  }
+  case object io  {
     case object estatico {
       val newtype =
         "io.estatico" %% "newtype" % "0.4.4"

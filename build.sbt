@@ -12,7 +12,7 @@ ThisBuild / scalacOptions ++=
     "-Xfatal-warnings",
     "-Yexplicit-nulls", // experimental (I've seen it cause issues with circe)
     "-Ykind-projector",
-    "-Ysafe-init" // experimental (I've seen it cause issues with circe)
+    "-Ysafe-init"       // experimental (I've seen it cause issues with circe)
   ) ++ Seq("-rewrite", "-indent") ++ Seq("-source", "future")
 
 lazy val `learning-scala3` =
@@ -38,7 +38,9 @@ lazy val commonScalacOptions = Seq(
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
     Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13),
-    org.tpolecat.typename
+    org.tpolecat.typename,
+    dev.optics.`monocle-core`,
+    dev.optics.`monocle-macro`
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,
