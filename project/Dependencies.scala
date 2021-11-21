@@ -31,5 +31,12 @@ object Dependencies {
       val typename =
         "org.tpolecat" %% "typename" % "1.0.0"
     }
+
+    case object typelevel {
+      val `cats-core` =
+        "org.typelevel" %% "cats-core" % "2.6.1"
+      val kittens =
+        "org.typelevel" %% "kittens" % "3.0.0-M1"
+    }
   }
 }

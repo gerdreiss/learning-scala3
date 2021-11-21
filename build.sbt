@@ -40,7 +40,9 @@ lazy val dependencies = Seq(
     Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13),
     org.tpolecat.typename,
     dev.optics.`monocle-core`,
-    dev.optics.`monocle-macro`
+    dev.optics.`monocle-macro`,
+    org.typelevel.`cats-core`,
+    org.typelevel.kittens
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,
