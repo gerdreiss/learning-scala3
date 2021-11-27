@@ -42,7 +42,8 @@ lazy val dependencies = Seq(
     dev.optics.`monocle-core`,
     dev.optics.`monocle-macro`,
     org.typelevel.`cats-core`,
-    org.typelevel.kittens
+    org.typelevel.kittens,
+    eu.timepit.refined
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,

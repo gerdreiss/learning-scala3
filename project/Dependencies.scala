@@ -9,6 +9,12 @@ object Dependencies {
         "dev.optics" %% "monocle-macro" % "3.1.0"
     }
   }
+  case object eu  {
+    case object timepit {
+      val refined =
+        "eu.timepit" %% "refined" % "0.9.27"
+    }
+  }
   case object io  {
     case object estatico {
       val newtype =
