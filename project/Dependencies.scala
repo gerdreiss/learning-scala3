@@ -12,7 +12,7 @@ object Dependencies {
   case object eu  {
     case object timepit {
       val refined =
-        "eu.timepit" %% "refined" % "0.9.27"
+        "eu.timepit" %% "refined" % "0.9.28"
     }
   }
   case object io  {
@@ -40,7 +40,7 @@ object Dependencies {
 
     case object typelevel {
       val `cats-core` =
-        "org.typelevel" %% "cats-core" % "2.6.1"
+        "org.typelevel" %% "cats-core" % "2.7.0"
       val kittens =
         "org.typelevel" %% "kittens" % "3.0.0-M1"
     }
