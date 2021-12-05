@@ -37,13 +37,14 @@ lazy val commonScalacOptions = Seq(
 
 lazy val dependencies = Seq(
   libraryDependencies ++= Seq(
-    Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13),
-    org.tpolecat.typename,
     dev.optics.`monocle-core`,
     dev.optics.`monocle-macro`,
+    eu.timepit.refined,
+    Dependencies.io.estatico.newtype.cross(CrossVersion.for3Use2_13),
+    org.`scala-lang`.modules.`scala-parser-combinators`,
+    org.tpolecat.typename,
     org.typelevel.`cats-core`,
-    org.typelevel.kittens,
-    eu.timepit.refined
+    org.typelevel.kittens
   ),
   libraryDependencies ++= Seq(
     org.scalatest.scalatest,

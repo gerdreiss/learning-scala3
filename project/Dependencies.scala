@@ -23,6 +23,13 @@ object Dependencies {
   }
 
   case object org {
+    case object `scala-lang` {
+      case object modules {
+        val `scala-parser-combinators` =
+          "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0"
+      }
+    }
+
     case object scalatest {
       val scalatest =
         "org.scalatest" %% "scalatest" % "3.2.10"
