@@ -1,9 +1,9 @@
-import scala.util._
-import scala.sys.process._
+import scala.util.*
+import scala.sys.process.*
 
-import sbt._
+import sbt.*
 
-object Util {
+object Util:
   def styled(in: Any): String =
     scala.Console.CYAN + in + scala.Console.RESET
 
@@ -23,10 +23,10 @@ object Util {
       .project
 
   private def gitPrompt: Option[String] =
-    for {
+    for
       b <- branch.map(styled)
       h <- hash.map(styled)
-    } yield s"git:$b:$h"
+    yield s"git:$b:$h"
 
   private def branch: Option[String] =
     run("git rev-parse --abbrev-ref HEAD")
@@ -48,4 +48,3 @@ object Util {
 
   val Cctt: String =
     "compile->compile;test->test"
-}
