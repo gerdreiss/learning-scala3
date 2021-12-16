@@ -1,4 +1,3 @@
-package learningscala3.coursera.effectiveprogramminginscala
 
 enum Shape:
   case Diamond, Squiggle, Oval

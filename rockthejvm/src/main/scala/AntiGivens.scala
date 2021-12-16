@@ -1,4 +1,4 @@
-package com.github.gerdreiss.learningscala3.rockthejvm
+
 
 object AntiGivens:
 

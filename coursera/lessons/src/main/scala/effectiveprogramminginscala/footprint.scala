@@ -1,5 +1,3 @@
-package learningscala3.coursera.effectiveprogramminginscala
-
 case class Experience(duration: Int, definition: Double, network: Network)
 
 enum Network:

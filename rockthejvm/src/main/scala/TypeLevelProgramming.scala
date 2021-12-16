@@ -1,24 +1,20 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object TypeLevelProgramming extends App:
 
   // Peano arithmetic
   trait Nat
-  class _0 extends Nat // 0
+  class _0             extends Nat // 0
   class Succ[N <: Nat] extends Nat // consecutive numbers
 
   // 2 = succ(succ(0))
-  type _1 = Succ[_0]
-  type _2 = Succ[_1]
-  type _3 = Succ[_2]
-  type _4 = Succ[_3]
-  type _5 = Succ[_4]
-  type _6 = Succ[_5]
-  type _7 = Succ[_6]
-  type _8 = Succ[_7]
-  type _9 = Succ[_8]
+  type _1  = Succ[_0]
+  type _2  = Succ[_1]
+  type _3  = Succ[_2]
+  type _4  = Succ[_3]
+  type _5  = Succ[_4]
+  type _6  = Succ[_5]
+  type _7  = Succ[_6]
+  type _8  = Succ[_7]
+  type _9  = Succ[_8]
   type _10 = Succ[_9]
 
   /*
@@ -36,14 +32,14 @@ object TypeLevelProgramming extends App:
   // less than
   trait <[A <: Nat, B <: Nat]
   object < :
-    given basic[N <: Nat]: <[_0, Succ[N]] with {}
+    given basic[N <: Nat]: <[_0, Succ[N]] with                                   {}
     given inductive[A <: Nat, B <: Nat](using <[A, B]): <[Succ[A], Succ[B]] with {}
 
     def apply[A <: Nat, B <: Nat](using lt: <[A, B]): <[A, B] = lt // summon resp. implicitly
 
-  //val threeLtOne = <[_3, _0] // does not compile
-  val `0 < 2` = <[_0, _2] // 0 < 2
-  val `1 < 3` = <[_1, _3] // 1 < 3
+  // val threeLtOne = <[_3, _0] // does not compile
+  val `0 < 2`  = <[_0, _2]  // 0 < 2
+  val `1 < 3`  = <[_1, _3]  // 1 < 3
   val `9 < 10` = <[_9, _10] // 9 < 10
 
   /*
@@ -61,7 +57,7 @@ object TypeLevelProgramming extends App:
    */
   trait <=[A <: Nat, B <: Nat]
   object <= :
-    given basic[N <: Nat]: <=[_0, N] with {}
+    given basic[N <: Nat]: <=[_0, N] with                                          {}
     given inductive[A <: Nat, B <: Nat](using <=[A, B]): <=[Succ[A], Succ[B]] with {}
 
     def apply[A <: Nat, B <: Nat](using lte: <=[A, B]): <=[A, B] = lte // summon resp. implicitly
@@ -73,7 +69,7 @@ object TypeLevelProgramming extends App:
 
   // list
   trait HList
-  class HNil extends HList
+  class HNil                           extends HList
   infix class ::[H <: Nat, T <: HList] extends HList
 
   /*
@@ -106,7 +102,7 @@ object TypeLevelProgramming extends App:
     def apply[HA <: HList, HB <: HList, O <: HList](using concat: Concat[HA, HB, O]) = concat
 
     // this does not compile since [0,1] ++ [3,3] != [1,1,2,3]
-    //val invalid = Concat[_0 :: _1 :: HNil, _2 :: _3 :: HNil, _1 :: _1 :: _2 :: _3 :: HNil]
+    // val invalid = Concat[_0 :: _1 :: HNil, _2 :: _3 :: HNil, _1 :: _1 :: _2 :: _3 :: HNil]
     val concat = Concat[_0 :: _1 :: HNil, _2 :: _3 :: HNil, _0 :: _1 :: _2 :: _3 :: HNil]
 
   // op 2 - partition
@@ -119,7 +115,7 @@ object TypeLevelProgramming extends App:
    */
   trait Partition[HL <: HList, L <: HList, R <: HList]
   object Partition:
-    given basicEmpty: Partition[HNil, HNil, HNil] with {}
+    given basicEmpty: Partition[HNil, HNil, HNil] with                   {}
     given basicOne[N <: Nat]: Partition[N :: HNil, N :: HNil, HNil] with {}
 
     given inductiveLTE[P <: Nat, N <: Nat, T <: HList, L <: HList, R <: HList](using
@@ -132,7 +128,9 @@ object TypeLevelProgramming extends App:
         <[P, N]
     ): Partition[P :: N :: T, P :: L, N :: R] with {}
 
-    def apply[HL <: HList, L <: HList, R <: HList](using partition: Partition[HL, L, R]): Partition[HL, L, R] =
+    def apply[HL <: HList, L <: HList, R <: HList](using
+        partition: Partition[HL, L, R]
+    ): Partition[HL, L, R] =
       partition
 
   /*
@@ -157,7 +155,15 @@ object TypeLevelProgramming extends App:
   trait QSort[L <: HList, O <: HList]
   object QSort:
     given basic: QSort[HNil, HNil] with {}
-    given inductive[N <: Nat, T <: HList, L <: HList, R <: HList, SL <: HList, SR <: HList, O <: HList](using
+    given inductive[
+        N <: Nat,
+        T <: HList,
+        L <: HList,
+        R <: HList,
+        SL <: HList,
+        SR <: HList,
+        O <: HList
+    ](using
         Partition[N :: T, N :: L, R],
         QSort[L, SL],
         QSort[R, SR],
@@ -177,13 +183,23 @@ object TypeLevelProgramming extends App:
   object Sort:
     type QSort[L <: HList, O <: HList] = Sort[L] { type Result = O }
 
-    given basic: QSort[HNil, HNil] = new Sort[HNil] { type Result = HNil }
-    given inductive[N <: Nat, T <: HList, L <: HList, R <: HList, SL <: HList, SR <: HList, O <: HList](using
+    given basic: QSort[HNil, HNil] = new Sort[HNil]:
+      type Result = HNil
+    given inductive[
+        N <: Nat,
+        T <: HList,
+        L <: HList,
+        R <: HList,
+        SL <: HList,
+        SR <: HList,
+        O <: HList
+    ](using
         Partition[N :: T, N :: L, R],
         QSort[L, SL],
         QSort[R, SR],
         Concat[SL, N :: R, O]
-    ): QSort[N :: T, O] = new Sort[N :: T] { type Result = O }
+    ): QSort[N :: T, O] = new Sort[N :: T]:
+      type Result = O
 
     def apply[L <: HList](using sort: Sort[L]): QSort[L, sort.Result] = sort
 

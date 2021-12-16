@@ -1,6 +1,3 @@
-package com.github.gerdreiss.learningscala3
-package rockthejvm
-
 object Lenses extends App:
 
   case class Guitar(make: String, model: String)
