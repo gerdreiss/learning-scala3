@@ -1,5 +1,3 @@
-package learningscala3.parsercombinators
-
 import scala.util.parsing.combinator.RegexParsers
 
 final case class WordFreq(word: String, count: Int):

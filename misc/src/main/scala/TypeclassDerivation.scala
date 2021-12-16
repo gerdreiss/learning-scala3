@@ -1,12 +1,10 @@
-package learningscala3
-
 import scala.deriving.*
-import scala.compiletime.{erasedValue, summonInline}
+import scala.compiletime.{ erasedValue, summonInline }
 
 inline def summonAll[T <: Tuple]: List[Eq[?]] =
   inline erasedValue[T] match
     case _: EmptyTuple => Nil
-    case _: (t *: ts) => summonInline[Eq[t]] :: summonAll[ts]
+    case _: (t *: ts)  => summonInline[Eq[t]] :: summonAll[ts]
 
 trait Eq[T]:
   def eqv(x: T, y: T): Boolean
@@ -29,8 +27,8 @@ object Eq:
   def eqProduct[T](p: Mirror.ProductOf[T], elems: => List[Eq[?]]): Eq[T] =
     new Eq[T]:
       def eqv(x: T, y: T): Boolean =
-        iterator(x).zip(iterator(y)).zip(elems.iterator).forall {
-          case ((x, y), elem) => check(elem)(x, y)
+        iterator(x).zip(iterator(y)).zip(elems.iterator).forall { case ((x, y), elem) =>
+          check(elem)(x, y)
         }
 
   inline given derived[T](using m: Mirror.Of[T]): Eq[T] =
