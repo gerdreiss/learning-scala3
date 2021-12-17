@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object Enums:
   enum Permissions:
     case READ, WRITE, EXEC, NONE
@@ -9,10 +5,10 @@ object Enums:
   val read = Permissions.READ
 
   enum PermissionsWithBits(val bits: Int):
-    case READ extends PermissionsWithBits(4) // 100
+    case READ extends PermissionsWithBits(4)  // 100
     case WRITE extends PermissionsWithBits(2) // 010
-    case EXEC extends PermissionsWithBits(1) // 001
-    case NONE extends PermissionsWithBits(0) // 000
+    case EXEC extends PermissionsWithBits(1)  // 001
+    case NONE extends PermissionsWithBits(0)  // 000
 
     def toHex: String | Null = Integer.toHexString(bits)
 
@@ -25,10 +21,10 @@ object Enums:
         case 4 => PermissionsWithBits.READ
 
   val read2: PermissionsWithBits = PermissionsWithBits.READ
-  val bitstring = read2.toHex
+  val bitstring                  = read2.toHex
 
   // standard API
 
-  val first = Permissions.READ.ordinal
+  val first          = Permissions.READ.ordinal
   val allPermissions = Permissions.values
   val readPermission = Permissions.valueOf("READ") // Permissions.READ

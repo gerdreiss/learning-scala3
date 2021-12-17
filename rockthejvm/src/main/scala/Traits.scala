@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object Traits:
   trait Talker(subject: String):
     def talkTo(another: Talker): String = ""

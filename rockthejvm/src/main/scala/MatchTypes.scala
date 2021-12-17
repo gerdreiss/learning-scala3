@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object MatchTypes:
 
   def lastDigitOf(n: BigInt): Int     = (n % 10).toInt
@@ -25,7 +21,7 @@ object MatchTypes:
   //   case s: String  => s.headOption.getOrElse(throw new NoSuchElementException)
   //   case l: List[T] => l.headOption.getOrElse(throw new NoSuchElementException)
 
-  val lastElm   = lastComponentOf(List(1, 2, 3))     //3
+  val lastElm   = lastComponentOf(List(1, 2, 3))     // 3
   val lastChar  = lastComponentOf("Scala")           // 'a'
   val lastDigit = lastComponentOf(BigInt(234234234)) // 4
 
@@ -47,6 +43,6 @@ object MatchTypes:
   def aNaiveMethod[T]: InfiniteRecursiveType[T] = ???
 
   // compiler error: Recursion limit exceeded
-  //val illegal: Int = aNaiveMethod[Int]
+  // val illegal: Int = aNaiveMethod[Int]
 
   def accumulate[T](accumulator: T, smallerValue: ConstituentPartOf[T]): T = ???

@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object TypeLambdas extends App:
 
   /*
@@ -18,14 +14,13 @@ object TypeLambdas extends App:
   // List is similar to a function = type constructor
   type MyList = [T] =>> List[T]
 
-  type MapWithStringKey = [T] =>> Map[String, T]
-  type MapWithStringKey2[T] = Map[String ,T] // exactly the same
+  type MapWithStringKey     = [T] =>> Map[String, T]
+  type MapWithStringKey2[T] = Map[String, T] // exactly the same
 
   val addressBook: MapWithStringKey[String] = Map.empty
 
   type SpecialEither = [T, E] =>> Either[E, Option[T]]
   val specialEither: SpecialEither[Int, String] /* Either[String, Option[Int]] */ = Right(Some(2))
-
 
   trait Monad[M[_]]:
     def pure[A](value: A): M[A]
@@ -35,8 +30,8 @@ object TypeLambdas extends App:
   // class EitherMonad[E] extends Monad[Either[E, ?]] {}
 
   class EitherMonad[E] extends Monad[[T] =>> Either[E, T]]:
-    def pure[A](value: A): Either[E, A] = Right(value)
+    def pure[A](value: A): Either[E, A]                                                  = Right(value)
     def flatMap[A, B](ma: Either[E, A])(transformation: A => Either[E, B]): Either[E, B] =
       ma match
-          case Right(value) => transformation(value)
-          case Left(error) => Left(error)
+        case Right(value) => transformation(value)
+        case Left(error)  => Left(error)

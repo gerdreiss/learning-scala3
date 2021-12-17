@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 import scala.annotation.showAsInfix
 
 object InfixMethods extends App:
@@ -14,7 +10,7 @@ object InfixMethods extends App:
 
   val person = Person("Mary")
   person.likes("Forrest Gump")
-  //person likes "Forrest Gump" // this is going to be deprecated in Scala 3.1
+  // person likes "Forrest Gump" // this is going to be deprecated in Scala 3.1
 
   // @showAsInfix
   // def (person: Person).enjoys(musicGenre: String): String =

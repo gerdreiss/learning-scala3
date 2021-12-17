@@ -1,7 +1,3 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 object OpaqueTypes extends App:
 
   //   case class Name(value: String) {
@@ -18,7 +14,7 @@ object OpaqueTypes extends App:
     // 1 = companion object
     object Name:
       def fromString(s: String): Option[Name] =
-        if (s.isEmpty || s.head.isLower) None else Some(s)
+        if s.isEmpty || s.head.isLower then None else Some(s)
 
     extension (n: Name) def length: Int = n.length
 

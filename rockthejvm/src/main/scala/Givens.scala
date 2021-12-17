@@ -1,36 +1,30 @@
-package com.github.gerdreiss
-package learningscala3
-package rockthejvm
-
 // census
 case class Person(
     surname: String,
     name: String,
-    age: Int,
-  )
+    age: Int
+)
 
 object Givens extends App:
   val people      = List(Person("Doe", "John", 50), Person("Doe", "Jane", 50))
   val maybePeople = people.map(Option(_))
 
   // use everywhere
-  val personOrdering: Ordering[Person] = new Ordering[Person] {
+  val personOrdering: Ordering[Person] = new Ordering[Person]:
     override def compare(a: Person, b: Person): Int =
       a.surname.compareTo(b.surname)
 
-  }
-
   def listPeople(
       person: Seq[Person]
-    )(
+  )(
       ordering: Ordering[Person] // <--explicit
-    ): Seq[Person] = ???
+  ): Seq[Person] = ???
 
   def someOtherFunctionRequiringOrdering(
       person: Seq[Person]
-    )(
+  )(
       ordering: Ordering[Person] // <--explicit
-    ): Int = ???
+  ): Int = ???
 
   listPeople(people)(personOrdering)
   someOtherFunctionRequiringOrdering(people)(personOrdering)
@@ -45,9 +39,9 @@ object Givens extends App:
 
   def someFunctionRequiringStandardOrdering(
       persons: List[Person]
-    )(using
+  )(using
       ordering: Ordering[Person] // <-- implicit
-    ): List[Person] = ???
+  ): List[Person] = ???
 
   // import givens
   // 1. import explicitly
