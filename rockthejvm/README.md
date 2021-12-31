@@ -1,8 +1,9 @@
-## sbt project compiled with Scala 3
+# Learning Scala 3 with Rock the JVM
 
-### Usage
+using
 
-This is a normal sbt project. You can compile code with `sbt compile`, run it with `sbt run`, and `sbt console` will start a Scala 3 REPL.
+- Rock the JVM's [Youtube channel]
+  - [Scala 3 Playlist](https://www.youtube.com/watch?v=orTmm6OMaLw&list=PLmtsMNDRU0BwsVUbhsH2HMqDMPNhQ0HPc)
+- Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
+  - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
 
-For more information on the sbt-dotty plugin, see the
-[scala3-example-project](https://github.com/scala/scala3-example-project/blob/main/README.md).
