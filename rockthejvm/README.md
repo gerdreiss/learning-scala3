@@ -2,7 +2,7 @@
 
 using
 
-- Rock the JVM's [Youtube channel]
+- Rock the JVM's [Youtube channel](https://www.youtube.com/channel/UCRS4DvO9X7qaqVYUW2_dwOw)
   - [Scala 3 Playlist](https://www.youtube.com/watch?v=orTmm6OMaLw&list=PLmtsMNDRU0BwsVUbhsH2HMqDMPNhQ0HPc)
 - Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
   - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
