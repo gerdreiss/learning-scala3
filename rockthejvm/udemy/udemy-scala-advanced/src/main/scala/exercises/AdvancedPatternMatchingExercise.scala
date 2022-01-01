@@ -2,7 +2,7 @@ package exercises
 
 object AdvancedPatternMatchingExercise extends App:
 
-  val nomatch = "\\_(ツ)_/¯"
+  val nomatch = """¯\_(ツ)_/¯"""
   val n: Int = 45
 
   // solve this via pattern matching

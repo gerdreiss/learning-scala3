@@ -2,7 +2,7 @@ package lectures.Section2_Lecture6
 
 object AdvancedPatternMatching extends App:
 
-  val nomatch = "\\_(ツ)_/¯"
+  val nomatch = """¯\_(ツ)_/¯"""
 
   val numbers = List(1)
   val description = numbers match
