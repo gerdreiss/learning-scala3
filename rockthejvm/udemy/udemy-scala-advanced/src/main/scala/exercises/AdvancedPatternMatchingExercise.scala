@@ -1,14 +1,15 @@
 package exercises
 
-object AdvancedPatternMatching extends App:
+object AdvancedPatternMatchingExercise extends App:
 
-  val n: Int = 4
+  val nomatch = "\\_(ツ)_/¯"
+  val n: Int = 45
 
   // solve this via pattern matching
   val matchedProperty = n match
     case x if x < 10 => "single digit"
     case x if x % 2 == 0 => "an even number"
-    case _ => "no match"
+    case _ => nomatch
 
   println(matchedProperty)
 
@@ -23,7 +24,7 @@ object AdvancedPatternMatching extends App:
   val matchedProperty2 = n match
     case SingleDigit(x) => "single digit"
     case EvenNumber(x) => "an even number"
-    case _ => "no match"
+    case _ => nomatch
 
   println(matchedProperty2)
 
@@ -35,7 +36,7 @@ object AdvancedPatternMatching extends App:
 
   val matchedProperty3 = n match
     case Property(p) => p
-    case _ => "no match"
+    case _ => nomatch
 
   println(matchedProperty3)
 
@@ -51,6 +52,6 @@ object AdvancedPatternMatching extends App:
   val danielled = n match
     case singleD() => "single digit"
     case even() => "an even number"
-    case _ => "no match"
+    case _ => nomatch
 
   println(danielled)
