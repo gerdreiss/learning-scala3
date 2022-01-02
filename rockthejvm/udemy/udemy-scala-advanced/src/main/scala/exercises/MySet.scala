@@ -15,7 +15,6 @@ trait MySet[A] extends (A => Boolean):
   def filterNot(p: A => Boolean): MySet[A]
   def foreach(f: A => Unit): Unit
   def unary_! : MySet[A]
-
 end MySet
 
 class EmptySet[A]() extends MySet[A]:
@@ -31,7 +30,6 @@ class EmptySet[A]() extends MySet[A]:
   override def filterNot(p: A => Boolean): MySet[A] = this
   override def foreach(f: A => Unit): Unit = ()
   override def unary_! : MySet[A] = PropertyBasedSet(_ => true)
-
 end EmptySet
 
 // this one is useless
@@ -48,7 +46,6 @@ class AllInclusiveSet[A] extends MySet[A]:
   def filterNot(p: A => Boolean): MySet[A] = ??? // property-based set?
   def foreach(f: A => Unit): Unit = ??? // impossible to implement
   def unary_! : MySet[A] = EmptySet()
-
 end AllInclusiveSet
 
 class PropertyBasedSet[A](property: A => Boolean) extends MySet[A]:
@@ -65,7 +62,8 @@ class PropertyBasedSet[A](property: A => Boolean) extends MySet[A]:
   def foreach(f: A => Unit): Unit = politelyFail
   def unary_! : MySet[A] = PropertyBasedSet(x => !property(x))
 
-  private def politelyFail = throw java.lang.IllegalArgumentException("Really deep rabbit hole!")
+  private def politelyFail =
+    throw java.lang.IllegalArgumentException("Really deep rabbit hole!")
 
 end PropertyBasedSet
 
@@ -84,11 +82,11 @@ class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
     // Daniel's solution:
     // if head == a then tail
     // else tail - a + head
-    // my solution
+    // my solution (I like mine better)
     filter(_ != a)
 
   override def --(that: MySet[A]): MySet[A] =
-    // Daniel's solution
+    // Daniel's solution (definitely a better one, needs the implementation of `def unary_!` though)
     // filter(!that)
     // my solution
     (for
@@ -127,7 +125,8 @@ class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
     f(head)
     tail.foreach(f)
 
-  override def unary_! : MySet[A] = PropertyBasedSet(x => !this.contains(x))
+  override def unary_! : MySet[A] =
+    PropertyBasedSet(x => !this.contains(x))
 
 end NonEmptySet
 
