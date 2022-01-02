@@ -9,7 +9,8 @@ object PartialFunctionsExercise extends App:
         case 2 => 58
         case 5 => 999
 
-      override def isDefinedAt(x: Int): Boolean = x == 1 || x == 2 || x == 5
+      override def isDefinedAt(x: Int): Boolean =
+        x == 1 || x == 2 || x == 5
 
   val chatbot: PartialFunction[String, String] = {
     case "hello" => "Hi, I'm HAL9000"

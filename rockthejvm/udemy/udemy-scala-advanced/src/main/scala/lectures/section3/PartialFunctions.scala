@@ -1,4 +1,4 @@
-package lectures.Section3_Lecture09
+package lectures.section3
 
 object PartialFunctions extends App:
 

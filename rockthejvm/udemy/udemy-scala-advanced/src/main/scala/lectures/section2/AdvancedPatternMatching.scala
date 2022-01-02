@@ -1,4 +1,4 @@
-package lectures.Section2_Lecture6
+package lectures.section2
 
 object AdvancedPatternMatching extends App:
 

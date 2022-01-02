@@ -1,4 +1,4 @@
-package lectures.Section2_Lecture5
+package lectures.section2
 
 import scala.util.Try
 
