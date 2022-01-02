@@ -1,7 +1,5 @@
 package exercises
 
-import scala.sys.Prop
-
 trait MySet[A] extends (A => Boolean):
   def apply(a: A): Boolean = contains(a)
 
