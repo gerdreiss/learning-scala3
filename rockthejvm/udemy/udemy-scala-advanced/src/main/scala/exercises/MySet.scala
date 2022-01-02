@@ -6,19 +6,65 @@ trait MySet[A] extends (A => Boolean):
   def contains(a: A): Boolean
   def +(a: A): MySet[A]
   def ++(that: MySet[A]): MySet[A]
+  def -(a: A): MySet[A]
+  def --(that: MySet[A]): MySet[A]
+  def &(that: MySet[A]): MySet[A]
   def map[B](f: A => B): MySet[B]
   def flatMap[B](f: A => MySet[B]): MySet[B]
   def filter(p: A => Boolean): MySet[A]
+  def filterNot(p: A => Boolean): MySet[A]
   def foreach(f: A => Unit): Unit
+  def unary_! : MySet[A] // my solution = filterNot(this)
+
+end MySet
 
 class EmptySet[A]() extends MySet[A]:
   override def contains(a: A): Boolean = false
   override def +(a: A): MySet[A] = NonEmptySet[A](a, this)
   override def ++(that: MySet[A]): MySet[A] = that
+  override def -(a: A): MySet[A] = this
+  override def --(that: MySet[A]): MySet[A] = this
+  override def &(that: MySet[A]): MySet[A] = this
   override def map[B](f: A => B): MySet[B] = EmptySet[B]()
   override def flatMap[B](f: A => MySet[B]): MySet[B] = EmptySet[B]()
   override def filter(p: A => Boolean): MySet[A] = this
+  override def filterNot(p: A => Boolean): MySet[A] = this
   override def foreach(f: A => Unit): Unit = ()
+  override def unary_! : MySet[A] = AllInclusiveSet()
+
+end EmptySet
+
+class AllInclusiveSet[A] extends MySet[A]:
+  def contains(a: A): Boolean = true
+  def +(a: A): MySet[A] = this
+  def ++(that: MySet[A]): MySet[A] = this
+  def -(a: A): MySet[A] = this // impossible to implement
+  def --(that: MySet[A]): MySet[A] = filter(!that)
+  def &(that: MySet[A]): MySet[A] = filter(that)
+  def map[B](f: A => B): MySet[B] = ??? // impossible to implement
+  def flatMap[B](f: A => MySet[B]): MySet[B] = ??? // impossible to implement
+  def filter(p: A => Boolean): MySet[A] = ??? // property-based set
+  def filterNot(p: A => Boolean): MySet[A] = ??? // impossible to implement
+  def foreach(f: A => Unit): Unit = ??? // impossible to implement
+  def unary_! : MySet[A] = EmptySet()
+
+end AllInclusiveSet
+
+class PropertyBasedSet[A](property: A => Boolean) extends MySet[A]:
+  def contains(a: A): Boolean = ???
+  def +(a: A): MySet[A] = ???
+  def ++(that: MySet[A]): MySet[A] = ???
+  def -(a: A): MySet[A] = ???
+  def --(that: MySet[A]): MySet[A] = ???
+  def &(that: MySet[A]): MySet[A] = ???
+  def map[B](f: A => B): MySet[B] = ???
+  def flatMap[B](f: A => MySet[B]): MySet[B] = ???
+  def filter(p: A => Boolean): MySet[A] = ???
+  def filterNot(p: A => Boolean): MySet[A] = ???
+  def foreach(f: A => Unit): Unit = ???
+  def unary_! : MySet[A] = ???
+
+end PropertyBasedSet
 
 class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
   override def contains(a: A): Boolean =
@@ -31,6 +77,35 @@ class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
   override def ++(that: MySet[A]): MySet[A] =
     tail ++ that + head
 
+  override def -(a: A): MySet[A] =
+    // Daniel's solution:
+    // if head == a then tail
+    // else tail - a + head
+    // my solution
+    filter(_ != a)
+
+  override def --(that: MySet[A]): MySet[A] =
+    // Daniel's solution
+    // filter(!that)
+    // my solution
+    (for
+      a1 <- this
+      a2 <- that
+    yield (a1, a2))
+      .filter(_ != _)
+      .map(_._1)
+
+  override def &(that: MySet[A]): MySet[A] =
+    // Daniel's solution, very elegant
+    // filter(that)
+    // my solution
+    (for
+      a1 <- this
+      a2 <- that
+    yield (a1, a2))
+      .filter(_ == _)
+      .map(_._1)
+
   override def map[B](f: A => B): MySet[B] =
     tail.map(f) + f(head)
 
@@ -41,9 +116,17 @@ class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
     if p(head) then tail.filter(p) + head
     else tail.filter(p)
 
+  override def filterNot(p: A => Boolean): MySet[A] =
+    if p(head) then tail.filter(p)
+    else tail.filter(p) + head
+
   override def foreach(f: A => Unit): Unit =
     f(head)
     tail.foreach(f)
+
+  override def unary_! : MySet[A] = this
+
+end NonEmptySet
 
 object MySet:
   def apply[A](values: A*): MySet[A] =
