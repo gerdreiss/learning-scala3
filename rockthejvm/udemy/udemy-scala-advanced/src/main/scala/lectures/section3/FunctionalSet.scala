@@ -1,4 +1,4 @@
-package exercises
+package lectures.section3
 
 trait MySet[A] extends (A => Boolean):
   def apply(a: A): Boolean = contains(a)
