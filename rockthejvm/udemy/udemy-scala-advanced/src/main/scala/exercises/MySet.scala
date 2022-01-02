@@ -86,26 +86,26 @@ class NonEmptySet[A](val head: A, val tail: MySet[A]) extends MySet[A]:
     filter(_ != a)
 
   override def --(that: MySet[A]): MySet[A] =
-    // Daniel's solution (definitely a better one, needs the implementation of `def unary_!` though)
-    // filter(!that)
     // my solution
-    (for
-      a1 <- this
-      a2 <- that
-    yield (a1, a2))
-      .filter(_ != _)
-      .map(_._1)
+    // (for
+    //   a1 <- this
+    //   a2 <- that
+    // yield (a1, a2))
+    //   .filter(_ != _)
+    //   .map(_._1)
+    // Daniel's solution (definitely a better one, needs the implementation of `def unary_!` though)
+    filter(!that)
 
   override def &(that: MySet[A]): MySet[A] =
-    // Daniel's solution, very elegant
-    // filter(that)
     // my solution
-    (for
-      a1 <- this
-      a2 <- that
-    yield (a1, a2))
-      .filter(_ == _)
-      .map(_._1)
+    // (for
+    //   a1 <- this
+    //   a2 <- that
+    // yield (a1, a2))
+    //   .filter(_ == _)
+    //   .map(_._1)
+    // Daniel's solution, very elegant
+    filter(that)
 
   override def map[B](f: A => B): MySet[B] =
     tail.map(f) + f(head)
