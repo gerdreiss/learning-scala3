@@ -73,17 +73,17 @@ object MyStream:
   def from[A](start: A)(generator: A => A): MyStream[A] =
     Cons(start, MyStream.from(generator(start))(generator))
 
+def fib(first: BigInt, second: BigInt): MyStream[BigInt] =
+  Cons(first, fib(second, first + second))
+
+def primes(numbers: MyStream[Int]): MyStream[Int] =
+  if numbers.isEmpty then numbers
+  else Cons(numbers.head, primes(numbers.tail.filter(_ % numbers.head != 0)))
+
 @main def testMyStream(): Unit =
-  val naturals = MyStream.from(1)(_ + 1)
-  println(naturals.head)
-  println(naturals.tail.head)
-
-  val from0 = 0 #:: naturals
-  println(from0.head)
-
-  // println(from0.takeAsList(10000))
-
-  // from0.map(_ * 2).take(100).foreach(println)
-  from0.flatMap(x => x #:: (x + 1) #:: EmptyStream).take(10).foreach(println)
-
-  println(from0.filter(_ % 4 == 0).take(10).toList())
+  println("-" * 50)
+  println("Fibonacci")
+  println(fib(1, 1).take(10).toList())
+  println("-" * 50)
+  println("Primes")
+  println(primes(MyStream.from(2)(_ + 1)).take(10).toList())
