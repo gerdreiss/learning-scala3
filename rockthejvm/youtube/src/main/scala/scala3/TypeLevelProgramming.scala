@@ -1,3 +1,5 @@
+package scala3
+
 object TypeLevelProgramming extends App:
 
   // Peano arithmetic

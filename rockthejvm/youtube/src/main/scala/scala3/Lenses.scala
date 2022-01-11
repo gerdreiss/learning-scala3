@@ -1,3 +1,5 @@
+package scala3
+
 object Lenses extends App:
 
   case class Guitar(make: String, model: String)

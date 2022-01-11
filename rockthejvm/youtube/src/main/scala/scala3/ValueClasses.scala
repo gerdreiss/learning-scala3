@@ -1,3 +1,5 @@
+package scala3
+
 import java.util.UUID
 
 object ValueClasses:

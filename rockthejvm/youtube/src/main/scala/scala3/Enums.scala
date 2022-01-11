@@ -1,3 +1,5 @@
+package scala3
+
 object Enums:
   enum Permissions:
     case READ, WRITE, EXEC, NONE

@@ -1,3 +1,5 @@
+package scala3
+
 object Traits:
   trait Talker(subject: String):
     def talkTo(another: Talker): String = ""

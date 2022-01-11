@@ -1,3 +1,5 @@
+package scala3
+
 object OpaqueTypes extends App:
 
   //   case class Name(value: String) {

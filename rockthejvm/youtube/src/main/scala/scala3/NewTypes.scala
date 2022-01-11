@@ -1,3 +1,5 @@
+package scala3
+
 import java.io.File
 
 object NewTypes extends App:

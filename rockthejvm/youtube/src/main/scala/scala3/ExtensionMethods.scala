@@ -1,3 +1,5 @@
+package scala3
+
 object ExtensionMethods extends App:
   // type enrichment == "pimping"
   case class Person(name: String):

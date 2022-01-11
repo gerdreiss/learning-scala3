@@ -1,3 +1,5 @@
+package scala3
+
 // census
 case class Person(
     surname: String,

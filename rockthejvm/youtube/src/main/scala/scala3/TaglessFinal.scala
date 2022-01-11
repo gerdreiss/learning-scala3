@@ -1,4 +1,6 @@
 // expression problem ==================================================
+package scala3
+
 object ExpressionProblem:
   trait Expr
   case class B(boolean: Boolean)          extends Expr

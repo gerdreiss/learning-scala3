@@ -1,3 +1,5 @@
+package scala3
+
 import scala.annotation.showAsInfix
 
 object InfixMethods extends App:

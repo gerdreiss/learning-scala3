@@ -1,3 +1,5 @@
+package scala3
+
 object TypeLambdas extends App:
 
   /*

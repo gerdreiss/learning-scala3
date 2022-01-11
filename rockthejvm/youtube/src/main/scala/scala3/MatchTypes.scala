@@ -1,3 +1,5 @@
+package scala3
+
 object MatchTypes:
 
   def lastDigitOf(n: BigInt): Int     = (n % 10).toInt
