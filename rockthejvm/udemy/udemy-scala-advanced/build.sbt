@@ -8,8 +8,8 @@ lazy val root = project
     scalaVersion := scala3Version,
     scalacOptions ++= Seq(
       "-deprecation", // emit warning and location for usages of deprecated APIs
-      // "-explain",             // explain errors in more detail
-      // "-explain-types",       // explain type errors in more detail
+      "-explain", // explain errors in more detail
+      "-explain-types", // explain type errors in more detail
       "-feature", // emit warning and location for usages of features that should be imported explicitly
       "-indent", // allow significant indentation.
       "-new-syntax", // require `then` and `do` in control expressions.
