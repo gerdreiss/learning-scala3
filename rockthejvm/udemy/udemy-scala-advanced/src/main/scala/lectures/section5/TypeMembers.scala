@@ -1,27 +1,29 @@
 package lectures.section5
 
-class Animal
-class Dog extends Animal
-class Cat extends Animal
+object TypeMembers:
 
-class AnimalCollection:
-  type AnimalType // abstract type member
-  type BoundedAnimal <: Animal
-  type SuperBoundedAnimal >: Dog <: Animal
-  type AnimalC = Cat
+  class Animal
+  class Dog extends Animal
+  class Cat extends Animal
 
-val ac = new AnimalCollection
-val dog: ac.AnimalType = ???
-val cat: ac.AnimalC = new Cat
+  class AnimalCollection:
+    type AnimalType // abstract type member
+    type BoundedAnimal <: Animal
+    type SuperBoundedAnimal >: Dog <: Animal
+    type AnimalC = Cat
 
-trait MyList:
-  type T
-  def add(element: T): MyList
+  val ac = new AnimalCollection
+  val dog: ac.AnimalType = ???
+  val cat: ac.AnimalC = new Cat
 
-class NonEmptyList(value: Int) extends MyList:
-  override type T = Int
-  def add(element: Int): MyList = ???
+  trait MyList:
+    type T
+    def add(element: T): MyList
 
-// .type
-type CatsType = cat.type
-val newCat: CatsType = cat
+  class NonEmptyList(value: Int) extends MyList:
+    override type T = Int
+    def add(element: Int): MyList = ???
+
+  // .type
+  type CatsType = cat.type
+  val newCat: CatsType = cat
