@@ -43,7 +43,7 @@ enum Opt[+T] derives Eq:
   case Sm(t: T)
   case Nn
 
-@main def testEqDerivation(): Unit =
+@main def EqDerivation(): Unit =
   import Opt.*
   val eqoi = summon[Eq[Opt[Int]]]
   assert(eqoi.eqv(Sm(23), Sm(23)))

@@ -8,7 +8,7 @@ object SimpleParser extends RegexParsers:
   def number: Parser[Int]    = """(0|[1-9]\d*)""".r ^^ { _.toInt }
   def freq: Parser[WordFreq] = word ~ number ^^ { case wd ~ fr => WordFreq(wd, fr) }
 
-@main def main(): Unit =
+@main def SimpleParserExe(): Unit =
   import SimpleParser.*
   parse(freq, "johnny 121") match
     case Success(matched, _) => println(matched)
