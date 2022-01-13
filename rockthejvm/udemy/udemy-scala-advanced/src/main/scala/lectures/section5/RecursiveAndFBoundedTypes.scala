@@ -2,7 +2,7 @@ package lectures.section5
 
 import lectures.section2.Recap.Crocodile
 
-object RecursiveAndFBoundedTypes:
+object RecursiveAndFBoundedTypes extends App:
 
   object FBoundedPolymorphism:
 
@@ -86,7 +86,7 @@ object RecursiveAndFBoundedTypes:
       def breed(using a: Animal[A]): List[A] =
         a.breed(animal)
 
-    val dog = new Dog
-    dog.breed
-
   end SimplerTypeClassSolution
+
+  val dog = new SimplerTypeClassSolution.Dog
+  dog.breed
