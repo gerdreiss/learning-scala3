@@ -8,5 +8,6 @@ using
 - Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
   - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
 - Rock the JVM's [Courses](https://rockthejvm.com)
+  - [Cats](https://rockthejvm.com/p/cats)
   - [Cats Effect](https://rockthejvm.com/p/cats-effect)
 
