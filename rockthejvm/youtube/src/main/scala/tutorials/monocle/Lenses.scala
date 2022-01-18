@@ -1,4 +1,4 @@
-package scala3
+package basics.tutorials.monocle
 
 object Lenses extends App:
 

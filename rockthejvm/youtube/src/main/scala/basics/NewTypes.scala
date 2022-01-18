@@ -1,4 +1,4 @@
-package scala3
+package basics
 
 import java.io.File
 

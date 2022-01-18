@@ -1,4 +1,4 @@
-package scala3
+package basics
 
 object OpaqueTypes extends App:
 

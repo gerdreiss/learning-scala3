@@ -1,5 +1,5 @@
 // expression problem ==================================================
-package scala3
+package basics
 
 object ExpressionProblem:
   trait Expr
