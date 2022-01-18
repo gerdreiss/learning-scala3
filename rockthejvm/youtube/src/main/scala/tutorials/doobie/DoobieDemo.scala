@@ -1,15 +1,22 @@
 package tutorials.doobie
 
+import cats.implicits.*
 import cats.effect.*
-import doobie.{ HC, HPS }
+import doobie.*
 import doobie.implicits.*
 import doobie.util.transactor.Transactor
 import doobie.util.update.Update
+import doobie.util.Get
+import doobie.util.Put
+import doobie.util.Read
+import doobie.util.Write
+import doobie.syntax.ConnectionIOOps
+import java.util.UUID
 
 object DoobieDemo extends IOApp:
 
   case class Actor(id: Int, name: String)
-  case class Movie(id: String, title: String, year: Int, actors: List[String], director: String)
+  case class Movie(id: UUID, title: String, year: Int, actors: List[String], director: String)
 
   extension [A](io: IO[A])
     def debug: IO[A] = io.map { a =>
@@ -94,6 +101,93 @@ object DoobieDemo extends IOApp:
       .compile
       .toList
       .transact(xa)
+
+  /** type classes for doobie
+    */
+
+  case class ActorName(name: String)
+
+  object ActorName:
+    given G: Get[ActorName] = Get[String].map(ActorName.apply)
+    given P: Put[ActorName] = Put[String].contramap(_.name)
+
+  def findAllActorNamesCustomClass: IO[List[ActorName]] =
+    sql"select name from actors"
+      .query[ActorName]
+      .to[List]
+      .transact(xa)
+
+  // value classes
+  case class DirectorId(id: Long)
+  case class DirectorName(name: String)
+  case class DirectorLastname(lastname: String)
+  case class Director(id: DirectorId, name: DirectorName, lastname: DirectorLastname)
+
+  object Director:
+    given R: Read[Director]  =
+      Read[(Long, String, String)].map { case (id, name, lastname) =>
+        Director(DirectorId(id), DirectorName(name), DirectorLastname(lastname))
+      }
+    given W: Write[Director] =
+      Write[(Long, String, String)].contramap {
+        case Director(DirectorId(id), DirectorName(name), DirectorLastname(lastname)) =>
+          (id, name, lastname)
+      }
+
+  // necessary imports so that we don't have to write an Get[Movie] instance
+
+  import doobie.postgres.*
+  import doobie.postgres.implicits.*
+
+  // write large queries
+  def findMovieByTitle(title: String): IO[Option[Movie]] =
+    sql"""
+      | select m.id, m.title, m.year_of_production, array_agg(a.name) as actors, d.name || ' ' || d.last_name
+      | from movies m
+      | join movies_actors ma on m.id = ma.movie_id
+      | join actors a on ma.actor_id = a.id
+      | join directors d on m.director_id = d.id
+      | where m.title = $title
+      | group by (m.id, m.title, m.year_of_product, d.name, d.last_name)
+    """.stripMargin
+      .query[Movie]
+      .option
+      .transact(xa)
+
+  def findMovieByTitle_v2(title: String): IO[Option[Movie]] =
+    def findMovieByTitle =
+      sql"select id, title, year_of_production from movies where title = $title"
+        .query[(UUID, String, Int, Int)]
+        .option
+
+    def findDirectorById(directorId: Long) =
+      sql"select name, last_name from directors where id = $directorId"
+        .query[(String, String)]
+        .option
+
+    def findActorsByMovieId(movieId: UUID) =
+      sql"""
+         | select a.name from actors a
+         | join movies_actors ma on a.id = ma.actor_id
+         | where ma.movie_id = $movieId
+      """.stripMargin
+        .query[String]
+        .to[List]
+
+    val query = for
+      maybeMovie    <- findMovieByTitle
+      maybeDirector <- maybeMovie match
+                         case Some((_, _, _, directorId)) => findDirectorById(directorId)
+                         case None                        => Option.empty[(String, String)].pure[ConnectionIO]
+      actors        <- maybeMovie match
+                         case Some((movieId, _, _, _)) => findActorsByMovieId(movieId)
+                         case None                     => List.empty[String].pure[ConnectionIO]
+    yield for
+      (id, title, year, _)  <- maybeMovie
+      (firstname, lastname) <- maybeDirector
+    yield Movie(id, title, year, actors, s"$firstname $lastname")
+
+    query.transact(xa)
 
   override def run(args: List[String]): IO[ExitCode] =
     IO(println("Hello, doobie")).as(ExitCode.Success)

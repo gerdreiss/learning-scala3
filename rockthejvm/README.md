@@ -5,6 +5,7 @@ using
 - Rock the JVM's [Youtube channel](https://www.youtube.com/channel/UCRS4DvO9X7qaqVYUW2_dwOw)
   - [Scala 3 Playlist](https://www.youtube.com/watch?v=orTmm6OMaLw&list=PLmtsMNDRU0BwsVUbhsH2HMqDMPNhQ0HPc)
   - [Doobie Tutorial](https://www.youtube.com/watch?v=SvFL7c6F9xI)
+  - [Doobie Tutorial, Part 2](https://www.youtube.com/watch?v=9xgOQh-Ppao)
 - Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
   - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
 
