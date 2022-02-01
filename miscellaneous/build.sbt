@@ -8,7 +8,6 @@ lazy val root = project
     scalaVersion := scala3Version,
     libraryDependencies ++= Seq(
       "eu.timepit"             %% "refined"                  % "0.9.28",
-      ("io.estatico"           %% "newtype"                  % "0.4.4").cross(CrossVersion.for3Use2_13),
       "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
       ("io.estatico"           %% "newtype"                  % "0.4.4").cross(CrossVersion.for3Use2_13)
     )
