@@ -37,7 +37,7 @@ end RNil
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T]:
   override def apply(index: Int): T =
     if index == 0 then head
-    else if index < 0 || tail.isEmpty then throw java.lang.IndexOutOfBoundsException()
+    else if index < 0 || tail.isEmpty then throw IndexOutOfBoundsException()
     else tail(index - 1)
 
   override def isEmpty: Boolean = false
@@ -56,8 +56,11 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     lengthTailrec(this, 0)
 
   override def :+[S >: T](elem: S): RList[S] =
-    if tail.isEmpty then head :: elem :: tail
-    else head :: (tail :+ elem)
+    // Stack overflow danger here:
+    //   if tail.isEmpty then head :: elem :: tail
+    //   else head :: (tail :+ elem)
+    // this should be better: concat with a list with one element
+    ++(elem :: RNil)
 
   override def ++[S >: T](that: RList[S]): RList[S] =
     @tailrec
