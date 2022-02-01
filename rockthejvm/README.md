@@ -8,4 +8,6 @@ using
   - [Doobie Tutorial, Part 2](https://www.youtube.com/watch?v=9xgOQh-Ppao)
 - Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
   - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
+- Rock the JVM's [Courses](https://www.rockthejvm.com/courses)
+  - [Scala & Functional Programming Interview Practice](https://rockthejvm.com/p/scala-functional-programming-interview-practice)
 
