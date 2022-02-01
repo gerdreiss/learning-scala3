@@ -90,7 +90,8 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else if remaining.isEmpty then predecessors.reverse
       else removeAtTailrec(remaining.tail, currentIndex + 1, remaining.head :: predecessors)
 
-    removeAtTailrec(this, 0, RNil)
+    if index < 0 then this
+    else removeAtTailrec(this, 0, RNil)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
