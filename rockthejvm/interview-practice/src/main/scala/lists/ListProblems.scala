@@ -15,20 +15,24 @@ sealed abstract class RList[+T]: // our covariant list
   def :+[S >: T](elem: S): RList[S]
   def ::[S >: T](elem: S): RList[S] = new ::(elem, this)
   def ++[S >: T](that: RList[S]): RList[S]
+  def -[S >: T](elem: S): RList[S]
+  def removeAt(index: Int): RList[T]
 
 end RList
 
 case object RNil extends RList[Nothing]:
 
-  override def apply(index: Int): Nothing  = throw ju.NoSuchElementException()
-  override def isEmpty: Boolean            = true
-  override def headOption: Option[Nothing] = None
-  override def head: Nothing               = throw ju.NoSuchElementException()
-  override def tail: RList[Nothing]        = throw ju.NoSuchElementException()
-  override def length: Int                 = 0
-  def :+[S >: Nothing](elem: S): RList[S]  = elem :: this
-  override def reverse: RList[Nothing]     = this
-  def ++[S >: Nothing](that: RList[S])     = that
+  override def apply(index: Int): Nothing               = throw ju.NoSuchElementException()
+  override def isEmpty: Boolean                         = true
+  override def headOption: Option[Nothing]              = None
+  override def head: Nothing                            = throw ju.NoSuchElementException()
+  override def tail: RList[Nothing]                     = throw ju.NoSuchElementException()
+  override def length: Int                              = 0
+  override def :+[S >: Nothing](elem: S): RList[S]      = elem :: this
+  override def reverse: RList[Nothing]                  = this
+  override def ++[S >: Nothing](that: RList[S])         = that
+  override def -[S >: Nothing](elem: S): RList[Nothing] = this
+  override def removeAt(index: Int): RList[Nothing]     = throw ju.NoSuchElementException()
 
   override def toString: String = "[]"
 
@@ -69,6 +73,24 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else concatTailrec(remaining.tail, remaining.head :: acc)
 
     concatTailrec(that, reverse).reverse
+
+  override def -[S >: T](elem: S): RList[S] =
+    @tailrec
+    def removeTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
+      if remaining.isEmpty then acc
+      else if remaining.head == elem then removeTailrec(remaining.tail, acc)
+      else removeTailrec(remaining.tail, remaining.head :: acc)
+
+    removeTailrec(this, RNil).reverse
+
+  override def removeAt(index: Int): RList[T] =
+    @tailrec
+    def removeAtTailrec(remaining: RList[T], currentIndex: Int, predecessors: RList[T]): RList[T] =
+      if currentIndex == index then predecessors.reverse ++ remaining.tail
+      else if remaining.isEmpty then predecessors.reverse
+      else removeAtTailrec(remaining.tail, currentIndex + 1, remaining.head :: predecessors)
+
+    removeAtTailrec(this, 0, RNil)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
@@ -128,3 +150,5 @@ object ListProblems extends App:
   println(largeList.reverse)
   println(largeList.reverse :+ "d")
   println(largeList ++ (10001 :: 10002 :: 10003 :: 10004 :: 10005 :: 10006 :: RNil))
+  println(largeList - 9999)
+  println(largeList.removeAt(9999))
