@@ -4,6 +4,7 @@ import java.util as ju
 import scala.annotation.tailrec
 
 sealed abstract class RList[+T]: // our covariant list
+
   def apply(index: Int): T
   def isEmpty: Boolean
   def headOption: Option[T]
@@ -13,10 +14,12 @@ sealed abstract class RList[+T]: // our covariant list
   def reverse: RList[T]
   def :+[S >: T](elem: S): RList[S]
   def ::[S >: T](elem: S): RList[S] = new ::(elem, this)
+  def ++[S >: T](that: RList[S]): RList[S]
 
 end RList
 
 case object RNil extends RList[Nothing]:
+
   override def apply(index: Int): Nothing  = throw ju.NoSuchElementException()
   override def isEmpty: Boolean            = true
   override def headOption: Option[Nothing] = None
@@ -25,6 +28,7 @@ case object RNil extends RList[Nothing]:
   override def length: Int                 = 0
   def :+[S >: Nothing](elem: S): RList[S]  = elem :: this
   override def reverse: RList[Nothing]     = this
+  def ++[S >: Nothing](that: RList[S])     = that
 
   override def toString: String = "[]"
 
@@ -54,6 +58,14 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   override def :+[S >: T](elem: S): RList[S] =
     if tail.isEmpty then head :: elem :: tail
     else head :: (tail :+ elem)
+
+  override def ++[S >: T](that: RList[S]): RList[S] =
+    @tailrec
+    def concatTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
+      if remaining.isEmpty then acc
+      else concatTailrec(remaining.tail, remaining.head :: acc)
+
+    concatTailrec(that, reverse).reverse
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
@@ -112,3 +124,4 @@ object ListProblems extends App:
   println(RNil.length)
   println(largeList.reverse)
   println(largeList.reverse :+ "d")
+  println(largeList ++ (10001 :: 10002 :: 10003 :: 10004 :: 10005 :: 10006 :: RNil))
