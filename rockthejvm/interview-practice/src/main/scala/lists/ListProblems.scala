@@ -24,6 +24,7 @@ sealed abstract class RList[+T]: // our covariant list
   def rle: RList[(T, Int)]
   def duplicateEach(n: Int): RList[T]
   def rotate(n: Int): RList[T] // rotate by a number of positions to the left
+  def sample(n: Int): RList[T]
 
 end RList
 
@@ -46,6 +47,7 @@ case object RNil extends RList[Nothing]:
   override def rle: RList[(Nothing, Int)]                    = RList.empty[(Nothing, Int)]
   override def duplicateEach(n: Int): RList[Nothing]         = this
   override def rotate(n: Int): RList[Nothing]                = this
+  override def sample(n: Int): RList[Nothing]                = this
 
   override def toString: String = "[]"
 
@@ -218,6 +220,32 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     rotateTailrecG(this, 0, RList.empty)
 
+  override def sample(n: Int): RList[T] =
+    @tailrec
+    def sampleTailrec(remaining: RList[T], nLeft: Int, acc: RList[T]): RList[T] =
+      if nLeft == 0 || remaining.isEmpty then acc
+      else
+        val randomIndex = Random.nextInt(remaining.length)
+        sampleTailrec(remaining.removeAt(randomIndex), nLeft - 1, remaining(randomIndex) :: acc)
+
+    // Dan's solution
+    // This solution could result in repeated numbers should the random index repeat
+    // Complexity: O(N * K)
+    @tailrec
+    def sampleTailrecDan(nRemaining: Int, acc: RList[T]): RList[T] =
+      if nRemaining == 0 then acc
+      else
+        val index     = Random.nextInt(length)
+        val newNumber = apply(index)
+        sampleTailrecDan(nRemaining - 1, newNumber :: acc)
+
+    // Complexity: O(N * K)
+    def sampleElegant: RList[T] =
+      RList.from((1 to n).map(_ => Random.nextInt(length)).map(index => apply(index)))
+
+    if n < 0 then RList.empty
+    else sampleTailrec(this, n, RList.empty)
+
   override def toString: String =
     @tailrec
     def toStringTailrec(remaining: RList[T], result: String): String =
@@ -289,3 +317,7 @@ object ListProblems extends App:
 
   println("-" * 100)
   println(smallList.rotate(113))
+
+  println("-" * 100)
+  println(smallList.sample(20))
+  println(largeList.sample(50))
