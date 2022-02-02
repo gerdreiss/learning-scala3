@@ -2,6 +2,7 @@ package lists
 
 import java.util as ju
 import scala.annotation.tailrec
+import scala.util.Random
 
 sealed abstract class RList[+T]: // our covariant list
 
@@ -20,6 +21,7 @@ sealed abstract class RList[+T]: // our covariant list
   def map[S](f: T => S): RList[S]
   def flatMap[S](f: T => RList[S]): RList[S]
   def filter(p: T => Boolean): RList[T]
+  def rle: RList[(T, Int)]
 
 end RList
 
@@ -39,6 +41,7 @@ case object RNil extends RList[Nothing]:
   override def map[S](f: Nothing => S): RList[S]             = this
   override def flatMap[S](f: Nothing => RList[S]): RList[S]  = this
   override def filter(p: Nothing => Boolean): RList[Nothing] = this
+  override def rle: RList[(Nothing, Int)]                    = RList.empty[(Nothing, Int)]
 
   override def toString: String = "[]"
 
@@ -143,6 +146,33 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     filterTailrec(this, RList.empty)
 
+  override def rle: RList[(T, Int)] =
+    @tailrec
+    def rleTailrecG(remaining: RList[T], acc: RList[(T, Int)]): RList[(T, Int)] =
+      if remaining.isEmpty then acc.reverse
+      else if acc.isEmpty || remaining.head != acc.head._1 then
+        val newHead = (remaining.head, 1)
+        rleTailrecG(remaining.tail, newHead :: acc)
+      else
+        val newHead = (remaining.head, acc.head._2 + 1)
+        rleTailrecG(remaining.tail, newHead :: acc.tail)
+
+    // Complexity: O(N)
+    @tailrec
+    def rleTailrecDan(
+        remaining: RList[T],
+        currentTuple: (T, Int),
+        acc: RList[(T, Int)]
+    ): RList[(T, Int)] =
+      if remaining.isEmpty && currentTuple._2 == 0 then acc
+      else if remaining.isEmpty then currentTuple :: acc
+      else if remaining.head == currentTuple._1 then
+        rleTailrecDan(remaining.tail, currentTuple.copy(_2 = currentTuple._2 + 1), acc)
+      else rleTailrecDan(remaining.tail, (remaining.head, 1), currentTuple :: acc)
+
+    // rleTailrecG(this, RList.empty)
+    rleTailrecDan(tail, (head, 1), RList.empty).reverse
+
   override def toString: String =
     @tailrec
     def toStringTailrec(remaining: RList[T], result: String): String =
@@ -177,30 +207,34 @@ object ListProblems extends App:
   val smallList = 1 :: 2 :: 3 :: 4 :: 5 :: RNil
   val largeList = RList.from((1 to len))
 
-  println(RList.empty)
-  println(smallList)
-  println("a" :: "b" :: "c" :: RNil)
-
-  println(largeList(0))
-  println(largeList(2))
-
+  // println(RList.empty)
+  // println(smallList)
+  // println("a" :: "b" :: "c" :: RNil)
+  // println(largeList(0))
+  // println(largeList(2))
   // println(l(3))  // IndexOutOfBoundsException
   // println(l(-1)) // IndexOutOfBoundsException
   // println(RNil(0)) // NoSuchElementException
-  println(largeList.length)
-  println(RNil.length)
-  println(largeList.reverse)
-  println(largeList.reverse :+ "d")
-  println(largeList ++ (len + 1 :: len + 2 :: len + 3 :: len + 4 :: len + 5 :: RNil))
-// println(largeList - (len - 1))
-// println(largeList.removeAt(len - 1))
-  println(smallList.map(_ * 10))
-  println(smallList.flatMap(x => x :: 2 * x :: RNil))
-  println(smallList.filter(_ % 2 == 0))
-  println(largeList.flatMap(x => x :: x * 2 :: RNil))
+  // println(largeList.length)
+  // println(RNil.length)
+  // println(largeList.reverse)
+  // println(largeList.reverse :+ "d")
+  // println(largeList ++ (len + 1 :: len + 2 :: len + 3 :: len + 4 :: len + 5 :: RNil))
+  // println(largeList - (len - 1))
+  // println(largeList.removeAt(len - 1))
+  // println(smallList.map(_ * 10))
+  // println(smallList.flatMap(x => x :: 2 * x :: RNil))
+  // println(smallList.filter(_ % 2 == 0))
+  // println(largeList.flatMap(x => x :: x * 2 :: RNil))
 
   val start = System.currentTimeMillis
   // largeList.map(_ * 100)
   largeList.flatMap(x => x :: x * 100 :: RNil)
   val lapse = System.currentTimeMillis - start
   println(lapse)
+
+  println("-" * 100)
+  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+  println(rleList)
+  println(rleList.rle)
+  println(largeList.flatMap(x => RList.from(List.fill(Random.nextInt(10))(x))).rle)
