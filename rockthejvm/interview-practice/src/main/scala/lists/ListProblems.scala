@@ -22,6 +22,7 @@ sealed abstract class RList[+T]: // our covariant list
   def flatMap[S](f: T => RList[S]): RList[S]
   def filter(p: T => Boolean): RList[T]
   def rle: RList[(T, Int)]
+  def duplicateEach(n: Int): RList[T]
 
 end RList
 
@@ -42,6 +43,8 @@ case object RNil extends RList[Nothing]:
   override def flatMap[S](f: Nothing => RList[S]): RList[S]  = this
   override def filter(p: Nothing => Boolean): RList[Nothing] = this
   override def rle: RList[(Nothing, Int)]                    = RList.empty[(Nothing, Int)]
+
+  override def duplicateEach(n: Int): RList[Nothing] = this
 
   override def toString: String = "[]"
 
@@ -170,8 +173,33 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
         rleTailrecDan(remaining.tail, currentTuple.copy(_2 = currentTuple._2 + 1), acc)
       else rleTailrecDan(remaining.tail, (remaining.head, 1), currentTuple :: acc)
 
-    // rleTailrecG(this, RList.empty)
-    rleTailrecDan(tail, (head, 1), RList.empty).reverse
+    // rleTailrecDan(tail, (head, 1), RList.empty).reverse
+    rleTailrecG(this, RList.empty)
+
+  override def duplicateEach(n: Int): RList[T] =
+    @tailrec
+    def duplicateEachTailrecG(remaining: RList[T], acc: RList[T]): RList[T] =
+      if remaining.isEmpty then acc
+      else
+        duplicateEachTailrecG(
+          remaining.tail,
+          acc ++ RList.from(Iterable.fill(n)(remaining.head))
+        )
+
+    @tailrec
+    def duplicateEachTailrecDan(
+        remaining: RList[T],
+        currentElement: T,
+        nDups: Int,
+        acc: RList[T]
+    ): RList[T] =
+      if remaining.isEmpty && nDups == n then acc
+      else if remaining.isEmpty then
+        duplicateEachTailrecDan(remaining, currentElement, nDups + 1, currentElement :: acc)
+      else if nDups == n then duplicateEachTailrecDan(remaining.tail, remaining.head, 0, acc)
+      else duplicateEachTailrecDan(remaining, currentElement, nDups + 1, currentElement :: acc)
+
+    duplicateEachTailrecG(this, RList.empty)
 
   override def toString: String =
     @tailrec
@@ -238,3 +266,6 @@ object ListProblems extends App:
   println(rleList)
   println(rleList.rle)
   println(largeList.flatMap(x => RList.from(List.fill(Random.nextInt(10))(x))).rle)
+
+  println("-" * 100)
+  println(smallList.duplicateEach(3))
