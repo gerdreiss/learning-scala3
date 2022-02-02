@@ -1,5 +1,7 @@
 package lists
 
+import org.graalvm.compiler.core.common.`type`.ArithmeticOpTable.BinaryOp.Rem
+
 import java.util as ju
 import scala.annotation.tailrec
 import scala.util.Random
@@ -38,7 +40,7 @@ case object RNil extends RList[Nothing]:
   override def length: Int                                   = 0
   override def :+[S >: Nothing](elem: S): RList[S]           = elem :: this
   override def reverse: RList[Nothing]                       = this
-  override def ++[S >: Nothing](that: RList[S])              = that
+  override def ++[S >: Nothing](that: RList[S]): RList[S]    = that
   override def -[S >: Nothing](elem: S): RList[Nothing]      = this
   override def removeAt(index: Int): RList[Nothing]          = throw ju.NoSuchElementException()
   override def map[S](f: Nothing => S): RList[S]             = this
@@ -141,7 +143,20 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       if remaining.isEmpty then acc.reverse
       else flatMapTailrecDan(remaining.tail, f(remaining.head).reverse ++ acc)
 
-    flatMapTailrecG(this, RList.empty)
+    // Complexity: O(Z)
+    @tailrec
+    def concatenateAll[S](elements: RList[RList[S]], current: RList[S], acc: RList[S]): RList[S] =
+      if current.isEmpty && elements.isEmpty then acc
+      else if current.isEmpty then concatenateAll(elements.tail, elements.head, acc)
+      else concatenateAll(elements, current.tail, current.head :: acc)
+
+    // Complexity: O(N + Z)
+    @tailrec
+    def betterFlatMap(remaining: RList[T], acc: RList[RList[S]]): RList[S] =
+      if remaining.isEmpty then concatenateAll(acc, RList.empty, RList.empty)
+      else betterFlatMap(remaining.tail, f(remaining.head).reverse :: acc)
+
+    betterFlatMap(this, RList.empty)
 
   override def filter(p: T => Boolean): RList[T] =
     @tailrec
@@ -241,7 +256,10 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     // Complexity: O(N * K)
     def sampleElegant: RList[T] =
-      RList.from((1 to n).map(_ => Random.nextInt(length)).map(index => apply(index)))
+      RList
+        .from(1 to n)
+        .map(_ => Random.nextInt(length))
+        .map(index => apply(index))
 
     if n < 0 then RList.empty
     else sampleTailrec(this, n, RList.empty)
@@ -278,7 +296,7 @@ object ListProblems extends App:
   val len = 10000
 
   val smallList = 1 :: 2 :: 3 :: 4 :: 5 :: RNil
-  val largeList = RList.from((1 to len))
+  val largeList = RList.from(1 to len)
 
   // println(RList.empty)
   // println(smallList)
@@ -300,24 +318,24 @@ object ListProblems extends App:
   // println(smallList.filter(_ % 2 == 0))
   // println(largeList.flatMap(x => x :: x * 2 :: RNil))
 
-  val start = System.currentTimeMillis
+  val start      = System.currentTimeMillis
   // largeList.map(_ * 100)
-  largeList.flatMap(x => x :: x * 100 :: RNil)
-  val lapse = System.currentTimeMillis - start
+  val flatMapped = largeList.flatMap(x => x :: x * 2 :: x * 3 :: x * 4 :: RNil)
+  val lapse      = System.currentTimeMillis - start
+  println(flatMapped)
   println(lapse)
 
-  println("-" * 100)
-  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
-  println(rleList)
-  println(rleList.rle)
-  // println(largeList.flatMap(x => RList.from(List.fill(Random.nextInt(10))(x))).rle)
-
-  println("-" * 100)
-  println(smallList.duplicateEach(3))
-
-  println("-" * 100)
-  println(smallList.rotate(113))
-
-  println("-" * 100)
-  println(smallList.sample(20))
-  println(largeList.sample(50))
+//  println("-" * 100)
+//  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+//  println(rleList)
+//  println(rleList.rle)
+//
+//  println("-" * 100)
+//  println(smallList.duplicateEach(3))
+//
+//  println("-" * 100)
+//  println(smallList.rotate(113))
+//
+//  println("-" * 100)
+//  println(smallList.sample(20))
+//  println(largeList.sample(50))
