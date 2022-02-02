@@ -318,24 +318,20 @@ object ListProblems extends App:
   // println(smallList.filter(_ % 2 == 0))
   // println(largeList.flatMap(x => x :: x * 2 :: RNil))
 
-  val start      = System.currentTimeMillis
-  // largeList.map(_ * 100)
-  val flatMapped = largeList.flatMap(x => x :: x * 2 :: x * 3 :: x * 4 :: RNil)
-  val lapse      = System.currentTimeMillis - start
-  println(flatMapped)
-  println(lapse)
+  // val start      = System.currentTimeMillis
+  // val flatMapped = largeList.flatMap(x => x :: x * 2 :: x * 3 :: x * 4 :: RNil)
+  // val lapse      = System.currentTimeMillis - start
+  // println(flatMapped)
+  // println(lapse)
 
-//  println("-" * 100)
-//  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
-//  println(rleList)
-//  println(rleList.rle)
-//
-//  println("-" * 100)
-//  println(smallList.duplicateEach(3))
-//
-//  println("-" * 100)
-//  println(smallList.rotate(113))
-//
-//  println("-" * 100)
-//  println(smallList.sample(20))
-//  println(largeList.sample(50))
+  println("-" * 100)
+  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+  println(rleList)
+  println(rleList.rle)
+  println("-" * 100)
+  println(smallList.duplicateEach(3))
+  println("-" * 100)
+  println(smallList.rotate(113))
+  println("-" * 100)
+  println(smallList.sample(20))
+  println(largeList.sample(50))
