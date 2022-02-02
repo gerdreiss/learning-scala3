@@ -23,6 +23,7 @@ sealed abstract class RList[+T]: // our covariant list
   def filter(p: T => Boolean): RList[T]
   def rle: RList[(T, Int)]
   def duplicateEach(n: Int): RList[T]
+  def rotate(n: Int): RList[T] // rotate by a number of positions to the left
 
 end RList
 
@@ -43,8 +44,8 @@ case object RNil extends RList[Nothing]:
   override def flatMap[S](f: Nothing => RList[S]): RList[S]  = this
   override def filter(p: Nothing => Boolean): RList[Nothing] = this
   override def rle: RList[(Nothing, Int)]                    = RList.empty[(Nothing, Int)]
-
-  override def duplicateEach(n: Int): RList[Nothing] = this
+  override def duplicateEach(n: Int): RList[Nothing]         = this
+  override def rotate(n: Int): RList[Nothing]                = this
 
   override def toString: String = "[]"
 
@@ -202,6 +203,21 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     duplicateEachTailrecG(this, RList.empty)
 
+  override def rotate(n: Int): RList[T] =
+    @tailrec
+    def rotateTailrecG(remaining: RList[T], currentShift: Int, acc: RList[T]): RList[T] =
+      if currentShift == n % length then remaining ++ acc.reverse
+      else rotateTailrecG(remaining.tail, currentShift + 1, remaining.head :: acc)
+
+    @tailrec
+    def rotateTailrecGDan(remaining: RList[T], rotationsLeft: Int, buffer: RList[T]): RList[T] =
+      if remaining.isEmpty && rotationsLeft == 0 then this
+      else if remaining.isEmpty then rotateTailrecGDan(this, rotationsLeft, RList.empty)
+      else if rotationsLeft == 0 then remaining ++ buffer.reverse
+      else rotateTailrecGDan(remaining.tail, rotationsLeft - 1, remaining.head :: buffer)
+
+    rotateTailrecG(this, 0, RList.empty)
+
   override def toString: String =
     @tailrec
     def toStringTailrec(remaining: RList[T], result: String): String =
@@ -266,7 +282,10 @@ object ListProblems extends App:
   val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
   println(rleList)
   println(rleList.rle)
-  println(largeList.flatMap(x => RList.from(List.fill(Random.nextInt(10))(x))).rle)
+  // println(largeList.flatMap(x => RList.from(List.fill(Random.nextInt(10))(x))).rle)
 
   println("-" * 100)
   println(smallList.duplicateEach(3))
+
+  println("-" * 100)
+  println(smallList.rotate(113))
