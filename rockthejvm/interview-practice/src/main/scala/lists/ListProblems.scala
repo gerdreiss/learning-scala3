@@ -186,6 +186,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
           acc ++ RList.from(Iterable.fill(n)(remaining.head))
         )
 
+    // Complexity: O(N * K)
     @tailrec
     def duplicateEachTailrecDan(
         remaining: RList[T],
