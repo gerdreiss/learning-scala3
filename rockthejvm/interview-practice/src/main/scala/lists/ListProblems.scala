@@ -17,22 +17,28 @@ sealed abstract class RList[+T]: // our covariant list
   def ++[S >: T](that: RList[S]): RList[S]
   def -[S >: T](elem: S): RList[S]
   def removeAt(index: Int): RList[T]
+  def map[S](f: T => S): RList[S]
+  def flatMap[S](f: T => RList[S]): RList[S]
+  def filter(p: T => Boolean): RList[T]
 
 end RList
 
 case object RNil extends RList[Nothing]:
 
-  override def apply(index: Int): Nothing               = throw ju.NoSuchElementException()
-  override def isEmpty: Boolean                         = true
-  override def headOption: Option[Nothing]              = None
-  override def head: Nothing                            = throw ju.NoSuchElementException()
-  override def tail: RList[Nothing]                     = throw ju.NoSuchElementException()
-  override def length: Int                              = 0
-  override def :+[S >: Nothing](elem: S): RList[S]      = elem :: this
-  override def reverse: RList[Nothing]                  = this
-  override def ++[S >: Nothing](that: RList[S])         = that
-  override def -[S >: Nothing](elem: S): RList[Nothing] = this
-  override def removeAt(index: Int): RList[Nothing]     = throw ju.NoSuchElementException()
+  override def apply(index: Int): Nothing                    = throw ju.NoSuchElementException()
+  override def isEmpty: Boolean                              = true
+  override def headOption: Option[Nothing]                   = None
+  override def head: Nothing                                 = throw ju.NoSuchElementException()
+  override def tail: RList[Nothing]                          = throw ju.NoSuchElementException()
+  override def length: Int                                   = 0
+  override def :+[S >: Nothing](elem: S): RList[S]           = elem :: this
+  override def reverse: RList[Nothing]                       = this
+  override def ++[S >: Nothing](that: RList[S])              = that
+  override def -[S >: Nothing](elem: S): RList[Nothing]      = this
+  override def removeAt(index: Int): RList[Nothing]          = throw ju.NoSuchElementException()
+  override def map[S](f: Nothing => S): RList[S]             = this
+  override def flatMap[S](f: Nothing => RList[S]): RList[S]  = this
+  override def filter(p: Nothing => Boolean): RList[Nothing] = this
 
   override def toString: String = "[]"
 
@@ -69,19 +75,19 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   override def ++[S >: T](that: RList[S]): RList[S] =
     @tailrec
     def concatTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
-      if remaining.isEmpty then acc
+      if remaining.isEmpty then acc.reverse
       else concatTailrec(remaining.tail, remaining.head :: acc)
 
-    concatTailrec(that, reverse).reverse
+    concatTailrec(that, reverse)
 
   override def -[S >: T](elem: S): RList[S] =
     @tailrec
     def removeTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
-      if remaining.isEmpty then acc
+      if remaining.isEmpty then acc.reverse
       else if remaining.head == elem then removeTailrec(remaining.tail, acc)
       else removeTailrec(remaining.tail, remaining.head :: acc)
 
-    removeTailrec(this, RNil).reverse
+    removeTailrec(this, RList.empty)
 
   override def removeAt(index: Int): RList[T] =
     @tailrec
@@ -91,7 +97,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else removeAtTailrec(remaining.tail, currentIndex + 1, remaining.head :: predecessors)
 
     if index < 0 then this
-    else removeAtTailrec(this, 0, RNil)
+    else removeAtTailrec(this, 0, RList.empty)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
@@ -105,7 +111,37 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       if remaining.isEmpty then acc
       else reverseTailrecDan(remaining.tail, remaining.head :: acc)
 
-    reverseTailrecDan(this, RNil)
+    reverseTailrecDan(this, RList.empty)
+
+  override def map[S](f: T => S): RList[S] =
+    @tailrec
+    def mapTailrec(remaining: RList[T], acc: RList[S]): RList[S] =
+      if remaining.isEmpty then acc.reverse
+      else mapTailrec(remaining.tail, f(remaining.head) :: acc)
+
+    mapTailrec(this, RList.empty)
+
+  override def flatMap[S](f: T => RList[S]): RList[S] =
+    @tailrec
+    def flatMapTailrecG(remaining: RList[T], acc: RList[S]): RList[S] =
+      if remaining.isEmpty then acc
+      else flatMapTailrecG(remaining.tail, acc ++ f(remaining.head))
+
+    @tailrec
+    def flatMapTailrecDan(remaining: RList[T], acc: RList[S]): RList[S] =
+      if remaining.isEmpty then acc.reverse
+      else flatMapTailrecDan(remaining.tail, f(remaining.head).reverse ++ acc)
+
+    flatMapTailrecG(this, RList.empty)
+
+  override def filter(p: T => Boolean): RList[T] =
+    @tailrec
+    def filterTailrec(remaining: RList[T], acc: RList[T]): RList[T] =
+      if remaining.isEmpty then acc.reverse
+      else if p(remaining.head) then filterTailrec(remaining.tail, remaining.head :: acc)
+      else filterTailrec(remaining.tail, acc)
+
+    filterTailrec(this, RList.empty)
 
   override def toString: String =
     @tailrec
@@ -125,24 +161,29 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 end ::
 
 object RList:
+  def empty[T]: RList[T] = RNil
+
   def from[T](iterable: Iterable[T]): RList[T] =
     @tailrec
     def fromTailrec(remaining: Iterable[T], acc: RList[T]): RList[T] =
-      if remaining.isEmpty then acc
+      if remaining.isEmpty then acc.reverse
       else fromTailrec(remaining.drop(1), remaining.head :: acc)
 
-    fromTailrec(iterable, RNil).reverse
+    fromTailrec(iterable, RList.empty)
 
 object ListProblems extends App:
+  val len = 10000
 
-  val largeList = RList.from((1 to 10000))
+  val smallList = 1 :: 2 :: 3 :: 4 :: 5 :: RNil
+  val largeList = RList.from((1 to len))
 
-  println(RNil)
-  println(::(1, ::(2, ::(3, RNil))))
+  println(RList.empty)
+  println(smallList)
   println("a" :: "b" :: "c" :: RNil)
 
   println(largeList(0))
   println(largeList(2))
+
   // println(l(3))  // IndexOutOfBoundsException
   // println(l(-1)) // IndexOutOfBoundsException
   // println(RNil(0)) // NoSuchElementException
@@ -150,6 +191,16 @@ object ListProblems extends App:
   println(RNil.length)
   println(largeList.reverse)
   println(largeList.reverse :+ "d")
-  println(largeList ++ (10001 :: 10002 :: 10003 :: 10004 :: 10005 :: 10006 :: RNil))
-  println(largeList - 9999)
-  println(largeList.removeAt(9999))
+  println(largeList ++ (len + 1 :: len + 2 :: len + 3 :: len + 4 :: len + 5 :: RNil))
+// println(largeList - (len - 1))
+// println(largeList.removeAt(len - 1))
+  println(smallList.map(_ * 10))
+  println(smallList.flatMap(x => x :: 2 * x :: RNil))
+  println(smallList.filter(_ % 2 == 0))
+  println(largeList.flatMap(x => x :: x * 2 :: RNil))
+
+  val start = System.currentTimeMillis
+  // largeList.map(_ * 100)
+  largeList.flatMap(x => x :: x * 100 :: RNil)
+  val lapse = System.currentTimeMillis - start
+  println(lapse)
