@@ -4,6 +4,7 @@ import org.graalvm.compiler.core.common.`type`.ArithmeticOpTable.BinaryOp.Rem
 
 import java.util as ju
 import scala.annotation.tailrec
+import scala.jdk.FunctionWrappers.RichToLongFunctionAsFunction1
 import scala.util.Random
 
 sealed abstract class RList[+T]: // our covariant list
@@ -20,6 +21,7 @@ sealed abstract class RList[+T]: // our covariant list
   def ++[S >: T](that: RList[S]): RList[S]
   def -[S >: T](elem: S): RList[S]
   def removeAt(index: Int): RList[T]
+  def splitAt(index: Int): (RList[T], RList[T])
   def map[S](f: T => S): RList[S]
   def flatMap[S](f: T => RList[S]): RList[S]
   def filter(p: T => Boolean): RList[T]
@@ -27,29 +29,34 @@ sealed abstract class RList[+T]: // our covariant list
   def duplicateEach(n: Int): RList[T]
   def rotate(n: Int): RList[T] // rotate by a number of positions to the left
   def sample(n: Int): RList[T]
+  def insertionSort[S >: T](ord: Ordering[S]): RList[S]
+  def mergeSort[S >: T](ord: Ordering[S]): RList[S]
 
 end RList
 
 case object RNil extends RList[Nothing]:
 
-  override def apply(index: Int): Nothing                    = throw ju.NoSuchElementException()
-  override def isEmpty: Boolean                              = true
-  override def headOption: Option[Nothing]                   = None
-  override def head: Nothing                                 = throw ju.NoSuchElementException()
-  override def tail: RList[Nothing]                          = throw ju.NoSuchElementException()
-  override def length: Int                                   = 0
-  override def :+[S >: Nothing](elem: S): RList[S]           = elem :: this
-  override def reverse: RList[Nothing]                       = this
-  override def ++[S >: Nothing](that: RList[S]): RList[S]    = that
-  override def -[S >: Nothing](elem: S): RList[Nothing]      = this
-  override def removeAt(index: Int): RList[Nothing]          = throw ju.NoSuchElementException()
-  override def map[S](f: Nothing => S): RList[S]             = this
-  override def flatMap[S](f: Nothing => RList[S]): RList[S]  = this
-  override def filter(p: Nothing => Boolean): RList[Nothing] = this
-  override def rle: RList[(Nothing, Int)]                    = RList.empty[(Nothing, Int)]
-  override def duplicateEach(n: Int): RList[Nothing]         = this
-  override def rotate(n: Int): RList[Nothing]                = this
-  override def sample(n: Int): RList[Nothing]                = this
+  override def apply(index: Int): Nothing                              = throw ju.NoSuchElementException()
+  override def isEmpty: Boolean                                        = true
+  override def headOption: Option[Nothing]                             = None
+  override def head: Nothing                                           = throw ju.NoSuchElementException()
+  override def tail: Nothing                                           = throw ju.NoSuchElementException()
+  override def length: Int                                             = 0
+  override def :+[S >: Nothing](elem: S): RList[S]                     = elem :: this
+  override def reverse: RList[Nothing]                                 = this
+  override def ++[S >: Nothing](that: RList[S]): RList[S]              = that
+  override def -[S >: Nothing](elem: S): RList[Nothing]                = this
+  override def removeAt(index: Int): Nothing                           = throw ju.NoSuchElementException()
+  override def splitAt(index: Int): Nothing                            = throw ju.NoSuchElementException()
+  override def map[S](f: Nothing => S): RList[S]                       = this
+  override def flatMap[S](f: Nothing => RList[S]): RList[S]            = this
+  override def filter(p: Nothing => Boolean): RList[Nothing]           = this
+  override def rle: RList[(Nothing, Int)]                              = RList.empty[(Nothing, Int)]
+  override def duplicateEach(n: Int): RList[Nothing]                   = this
+  override def rotate(n: Int): RList[Nothing]                          = this
+  override def sample(n: Int): RList[Nothing]                          = this
+  override def insertionSort[S >: Nothing](ord: Ordering[S]): RList[S] = this
+  override def mergeSort[S >: Nothing](ord: Ordering[S]): RList[S]     = this
 
   override def toString: String = "[]"
 
@@ -109,6 +116,15 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     if index < 0 then this
     else removeAtTailrec(this, 0, RList.empty)
+
+  override def splitAt(index: Int): (RList[T], RList[T]) =
+    @tailrec
+    def splitAtTailrec(left: RList[T], right: RList[T], count: Int): (RList[T], RList[T]) =
+      if count == 0 then (left.reverse, right)
+      else if right.isEmpty then throw ArrayIndexOutOfBoundsException(index)
+      else splitAtTailrec(right.head :: left, right.tail, count - 1)
+
+    splitAtTailrec(RList.empty, this, index)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
@@ -264,6 +280,64 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     if n < 0 then RList.empty
     else sampleTailrec(this, n, RList.empty)
 
+  override def insertionSort[S >: T](ord: Ordering[S]): RList[S] =
+    // Complexity: O(N)
+    @tailrec
+    def insertSorted(elem: T, before: RList[S], after: RList[S]): RList[S] =
+      if after.isEmpty || ord.lteq(elem, after.head) then before.reverse ++ (elem :: after)
+      else insertSorted(elem, after.head :: before, after.tail)
+    // Complexity: O(N^2)
+    @tailrec
+    def insertSortTailrec(remaining: RList[T], acc: RList[S]): RList[S]    =
+      if remaining.isEmpty then acc
+      else insertSortTailrec(remaining.tail, insertSorted(remaining.head, RList.empty, acc))
+
+    insertSortTailrec(this, RList.empty)
+
+  override def mergeSort[S >: T](ord: Ordering[S]): RList[S] =
+    // Dan's solution
+    @tailrec
+    def mergeDan(a: RList[S], b: RList[S], acc: RList[S]): RList[S] =
+      if a.isEmpty then acc.reverse ++ b
+      else if b.isEmpty then acc.reverse ++ a
+      else if ord.lteq(a.head, b.head) then mergeDan(a.tail, b, a.head :: acc)
+      else mergeDan(a, b.tail, b.head :: acc)
+
+    // Complexity: O(n * log(n))
+    @tailrec
+    def mergeSortDan(smallLists: RList[RList[S]], bigLists: RList[RList[S]]): RList[S] =
+      if smallLists.isEmpty then
+        if bigLists.isEmpty then RList.empty
+        else if bigLists.tail.isEmpty then bigLists.head
+        else mergeSortDan(bigLists, RList.empty)
+      else if smallLists.tail.isEmpty then
+        if bigLists.isEmpty then smallLists.head
+        else mergeSortDan(smallLists.head :: bigLists, RList.empty)
+      else
+        val first  = smallLists.head
+        val second = smallLists.tail.head
+        val merged = mergeDan(first, second, RList.empty)
+        mergeSortDan(smallLists.tail.tail, merged :: bigLists)
+
+    // Solution inspired by https://medium.com/analytics-vidhya/playing-with-scala-merge-sort-d382fb1a32ff
+    @tailrec
+    def mergeG(left: RList[S], right: RList[S], acc: RList[S] = RList.empty): RList[S] =
+      (left, right) match
+        case (RNil, _)          => acc ++ right
+        case (_, RNil)          => acc ++ left
+        case (l :: ls, r :: rs) =>
+          if ord.lteq(l, r) then mergeG(ls, right, acc :+ l)
+          else mergeG(left, rs, acc :+ r)
+
+    def mergeSortG(list: RList[S]): RList[S] =
+      if list.length < 2 then list
+      else
+        val (left, right) = list.splitAt(list.length / 2)
+        mergeG(mergeSortG(left), mergeSortG(right))
+
+    // mergeSortDan(map(_ :: RNil), RNil)
+    mergeSortG(this)
+
   override def toString: String =
     @tailrec
     def toStringTailrec(remaining: RList[T], result: String): String =
@@ -325,7 +399,7 @@ object ListProblems extends App:
   // println(lapse)
 
   println("-" * 100)
-  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+  val rleList         = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
   println(rleList)
   println(rleList.rle)
   println("-" * 100)
@@ -335,3 +409,11 @@ object ListProblems extends App:
   println("-" * 100)
   println(smallList.sample(20))
   println(largeList.sample(50))
+  println("-" * 100)
+  val unsortedList    = 10 :: 3 :: 30 :: 100 :: 3 :: 1 :: 2 :: RNil
+  println(unsortedList)
+  println(unsortedList.insertionSort(Ordering.fromLessThan(_ < _)))
+  val anotherUnsorted = largeList.sample(20)
+  println(anotherUnsorted)
+  println(anotherUnsorted.insertionSort(Ordering.fromLessThan(_ < _)))
+  println(anotherUnsorted.mergeSort(Ordering.fromLessThan(_ < _)))
