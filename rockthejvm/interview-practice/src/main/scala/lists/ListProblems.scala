@@ -403,6 +403,8 @@ object RList:
 end RList
 
 object ListProblems extends App:
+  val ordering: Ordering[Int] = Ordering.fromLessThan(_ < _)
+
   val len = 10000
 
   val smallList = 1 :: 2 :: 3 :: 4 :: 5 :: RNil
@@ -434,25 +436,23 @@ object ListProblems extends App:
   // println(flatMapped)
   // println(lapse)
 
-  println("-" * 100)
-  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
-  println(rleList)
-  println(rleList.rle)
-  println("-" * 100)
-  println(smallList.duplicateEach(3))
-  println("-" * 100)
-  println(smallList.rotate(113))
-  println("-" * 100)
-  println(smallList.sample(20))
-  println(largeList.sample(50))
-  println("-" * 100)
-
-  private val value: Ordering[Int] = Ordering.fromLessThan(_ < _)
+  // println("-" * 100)
+  // val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+  // println(rleList)
+  // println(rleList.rle)
+  // println("-" * 100)
+  // println(smallList.duplicateEach(3))
+  // println("-" * 100)
+  // println(smallList.rotate(113))
+  // println("-" * 100)
+  // println(smallList.sample(20))
+  // println(largeList.sample(50))
+  // println("-" * 100)
 
   val unsortedList    = 10 :: 3 :: 30 :: 100 :: 3 :: 1 :: 2 :: RNil
   val anotherUnsorted = largeList.sample(20)
 
   println(s"Unsorted       : $anotherUnsorted")
-  println(s"Insertion sort : ${anotherUnsorted.insertionSort(value)}")
-  println(s"Merge sort     : ${anotherUnsorted.mergeSort(value)}")
-  println(s"Quick sort     : ${anotherUnsorted.quickSort(value)}")
+  println(s"Insertion sort : ${anotherUnsorted.insertionSort(ordering)}")
+  println(s"Merge sort     : ${anotherUnsorted.mergeSort(ordering)}")
+  println(s"Quick sort     : ${anotherUnsorted.quickSort(ordering)}")
