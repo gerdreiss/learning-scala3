@@ -79,11 +79,11 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     // 1 + tail.length
     // therefore a tail recursive function:
     @tailrec
-    def lengthTailrec(remaining: RList[T], acc: Int): Int =
+    def rec(remaining: RList[T], acc: Int): Int =
       if remaining.isEmpty then acc
-      else lengthTailrec(remaining.tail, acc + 1)
+      else rec(remaining.tail, acc + 1)
 
-    lengthTailrec(this, 0)
+    rec(this, 0)
 
   override def :+[S >: T](elem: S): RList[S] =
     // Stack overflow danger here:
@@ -94,72 +94,72 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
   override def ++[S >: T](that: RList[S]): RList[S] =
     @tailrec
-    def concatTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
+    def rec(remaining: RList[S], acc: RList[S]): RList[S] =
       if remaining.isEmpty then acc.reverse
-      else concatTailrec(remaining.tail, remaining.head :: acc)
+      else rec(remaining.tail, remaining.head :: acc)
 
-    concatTailrec(that, reverse)
+    rec(that, reverse)
 
   override def -[S >: T](elem: S): RList[S] =
     @tailrec
-    def removeTailrec(remaining: RList[S], acc: RList[S]): RList[S] =
+    def rec(remaining: RList[S], acc: RList[S]): RList[S] =
       if remaining.isEmpty then acc.reverse
-      else if remaining.head == elem then removeTailrec(remaining.tail, acc)
-      else removeTailrec(remaining.tail, remaining.head :: acc)
+      else if remaining.head == elem then rec(remaining.tail, acc)
+      else rec(remaining.tail, remaining.head :: acc)
 
-    removeTailrec(this, RList.empty)
+    rec(this, RList.empty)
 
   override def removeAt(index: Int): RList[T] =
     @tailrec
-    def removeAtTailrec(remaining: RList[T], currentIndex: Int, predecessors: RList[T]): RList[T] =
+    def rec(remaining: RList[T], currentIndex: Int, predecessors: RList[T]): RList[T] =
       if currentIndex == index then predecessors.reverse ++ remaining.tail
       else if remaining.isEmpty then predecessors.reverse
-      else removeAtTailrec(remaining.tail, currentIndex + 1, remaining.head :: predecessors)
+      else rec(remaining.tail, currentIndex + 1, remaining.head :: predecessors)
 
-    if index < 0 then this
-    else removeAtTailrec(this, 0, RList.empty)
+    if index < 0 || index >= length then throw ArrayIndexOutOfBoundsException(index)
+    else rec(this, 0, RList.empty)
 
   override def splitAt(index: Int): (RList[T], RList[T]) =
     @tailrec
-    def splitAtTailrec(left: RList[T], right: RList[T], count: Int): (RList[T], RList[T]) =
+    def rec(left: RList[T], right: RList[T], count: Int): (RList[T], RList[T]) =
       if count == 0 then (left.reverse, right)
-      else splitAtTailrec(right.head :: left, right.tail, count - 1)
+      else rec(right.head :: left, right.tail, count - 1)
 
     if index < 0 || index >= length then throw ArrayIndexOutOfBoundsException(index)
-    else splitAtTailrec(RList.empty, this, index)
+    else rec(RList.empty, this, index)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
     @tailrec
-    def reverseTailrecG(remaining: RList[T], acc: RList[T]): RList[T] =
+    def recG(remaining: RList[T], acc: RList[T]): RList[T] =
       if remaining.isEmpty then acc
-      else reverseTailrecG(remaining.tail, acc :+ remaining.head)
+      else recG(remaining.tail, acc :+ remaining.head)
 
     @tailrec
-    def reverseTailrecDan(remaining: RList[T], acc: RList[T]): RList[T] =
+    def recDan(remaining: RList[T], acc: RList[T]): RList[T] =
       if remaining.isEmpty then acc
-      else reverseTailrecDan(remaining.tail, remaining.head :: acc)
+      else recDan(remaining.tail, remaining.head :: acc)
 
-    reverseTailrecDan(this, RList.empty)
+    recDan(this, RList.empty)
 
   override def map[S](f: T => S): RList[S] =
     @tailrec
-    def mapTailrec(remaining: RList[T], acc: RList[S]): RList[S] =
+    def rec(remaining: RList[T], acc: RList[S]): RList[S] =
       if remaining.isEmpty then acc.reverse
-      else mapTailrec(remaining.tail, f(remaining.head) :: acc)
+      else rec(remaining.tail, f(remaining.head) :: acc)
 
-    mapTailrec(this, RList.empty)
+    rec(this, RList.empty)
 
   override def flatMap[S](f: T => RList[S]): RList[S] =
     @tailrec
-    def flatMapTailrecG(remaining: RList[T], acc: RList[S]): RList[S] =
+    def recG(remaining: RList[T], acc: RList[S]): RList[S] =
       if remaining.isEmpty then acc
-      else flatMapTailrecG(remaining.tail, acc ++ f(remaining.head))
+      else recG(remaining.tail, acc ++ f(remaining.head))
 
     @tailrec
-    def flatMapTailrecDan(remaining: RList[T], acc: RList[S]): RList[S] =
+    def recDan(remaining: RList[T], acc: RList[S]): RList[S] =
       if remaining.isEmpty then acc.reverse
-      else flatMapTailrecDan(remaining.tail, f(remaining.head).reverse ++ acc)
+      else recDan(remaining.tail, f(remaining.head).reverse ++ acc)
 
     // Complexity: O(N + Z)
     @tailrec
@@ -171,27 +171,27 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
   override def filter(p: T => Boolean): RList[T] =
     @tailrec
-    def filterTailrec(remaining: RList[T], acc: RList[T]): RList[T] =
+    def rec(remaining: RList[T], acc: RList[T]): RList[T] =
       if remaining.isEmpty then acc.reverse
-      else if p(remaining.head) then filterTailrec(remaining.tail, remaining.head :: acc)
-      else filterTailrec(remaining.tail, acc)
+      else if p(remaining.head) then rec(remaining.tail, remaining.head :: acc)
+      else rec(remaining.tail, acc)
 
-    filterTailrec(this, RList.empty)
+    rec(this, RList.empty)
 
   override def rle: RList[(T, Int)] =
     @tailrec
-    def rleTailrecG(remaining: RList[T], acc: RList[(T, Int)]): RList[(T, Int)] =
+    def recG(remaining: RList[T], acc: RList[(T, Int)]): RList[(T, Int)] =
       if remaining.isEmpty then acc.reverse
       else if acc.isEmpty || remaining.head != acc.head._1 then
         val newHead = (remaining.head, 1)
-        rleTailrecG(remaining.tail, newHead :: acc)
+        recG(remaining.tail, newHead :: acc)
       else
         val newHead = (remaining.head, acc.head._2 + 1)
-        rleTailrecG(remaining.tail, newHead :: acc.tail)
+        recG(remaining.tail, newHead :: acc.tail)
 
     // Complexity: O(N)
     @tailrec
-    def rleTailrecDan(
+    def recDan(
         remaining: RList[T],
         currentTuple: (T, Int),
         acc: RList[(T, Int)]
@@ -199,25 +199,25 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       if remaining.isEmpty && currentTuple._2 == 0 then acc
       else if remaining.isEmpty then currentTuple :: acc
       else if remaining.head == currentTuple._1 then
-        rleTailrecDan(remaining.tail, currentTuple.copy(_2 = currentTuple._2 + 1), acc)
-      else rleTailrecDan(remaining.tail, (remaining.head, 1), currentTuple :: acc)
+        recDan(remaining.tail, currentTuple.copy(_2 = currentTuple._2 + 1), acc)
+      else recDan(remaining.tail, (remaining.head, 1), currentTuple :: acc)
 
-    // rleTailrecDan(tail, (head, 1), RList.empty).reverse
-    rleTailrecG(this, RList.empty)
+    // recDan(tail, (head, 1), RList.empty).reverse
+    recG(this, RList.empty)
 
   override def duplicateEach(n: Int): RList[T] =
     @tailrec
-    def duplicateEachTailrecG(remaining: RList[T], acc: RList[T]): RList[T] =
+    def recG(remaining: RList[T], acc: RList[T]): RList[T] =
       if remaining.isEmpty then acc
       else
-        duplicateEachTailrecG(
+        recG(
           remaining.tail,
           acc ++ RList.from(Iterable.fill(n)(remaining.head))
         )
 
     // Complexity: O(N * K)
     @tailrec
-    def duplicateEachTailrecDan(
+    def recDan(
         remaining: RList[T],
         currentElement: T,
         nDups: Int,
@@ -225,45 +225,45 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     ): RList[T] =
       if remaining.isEmpty && nDups == n then acc
       else if remaining.isEmpty then
-        duplicateEachTailrecDan(remaining, currentElement, nDups + 1, currentElement :: acc)
-      else if nDups == n then duplicateEachTailrecDan(remaining.tail, remaining.head, 0, acc)
-      else duplicateEachTailrecDan(remaining, currentElement, nDups + 1, currentElement :: acc)
+        recDan(remaining, currentElement, nDups + 1, currentElement :: acc)
+      else if nDups == n then recDan(remaining.tail, remaining.head, 0, acc)
+      else recDan(remaining, currentElement, nDups + 1, currentElement :: acc)
 
-    duplicateEachTailrecG(this, RList.empty)
+    recG(this, RList.empty)
 
   override def rotate(n: Int): RList[T] =
     @tailrec
-    def rotateTailrecG(remaining: RList[T], currentShift: Int, acc: RList[T]): RList[T] =
+    def recG(remaining: RList[T], currentShift: Int, acc: RList[T]): RList[T] =
       if currentShift == n % length then remaining ++ acc.reverse
-      else rotateTailrecG(remaining.tail, currentShift + 1, remaining.head :: acc)
+      else recG(remaining.tail, currentShift + 1, remaining.head :: acc)
 
     @tailrec
-    def rotateTailrecGDan(remaining: RList[T], rotationsLeft: Int, buffer: RList[T]): RList[T] =
+    def recDan(remaining: RList[T], rotationsLeft: Int, buffer: RList[T]): RList[T] =
       if remaining.isEmpty && rotationsLeft == 0 then this
-      else if remaining.isEmpty then rotateTailrecGDan(this, rotationsLeft, RList.empty)
+      else if remaining.isEmpty then recDan(this, rotationsLeft, RList.empty)
       else if rotationsLeft == 0 then remaining ++ buffer.reverse
-      else rotateTailrecGDan(remaining.tail, rotationsLeft - 1, remaining.head :: buffer)
+      else recDan(remaining.tail, rotationsLeft - 1, remaining.head :: buffer)
 
-    rotateTailrecG(this, 0, RList.empty)
+    recG(this, 0, RList.empty)
 
   override def sample(n: Int): RList[T] =
     @tailrec
-    def sampleTailrec(remaining: RList[T], nLeft: Int, acc: RList[T]): RList[T] =
+    def rec(remaining: RList[T], nLeft: Int, acc: RList[T]): RList[T] =
       if nLeft == 0 || remaining.isEmpty then acc
       else
         val randomIndex = Random.nextInt(remaining.length)
-        sampleTailrec(remaining.removeAt(randomIndex), nLeft - 1, remaining(randomIndex) :: acc)
+        rec(remaining.removeAt(randomIndex), nLeft - 1, remaining(randomIndex) :: acc)
 
     // Dan's solution
     // This solution could result in repeated numbers should the random index repeat
     // Complexity: O(N * K)
     @tailrec
-    def sampleTailrecDan(nRemaining: Int, acc: RList[T]): RList[T] =
+    def recDan(nRemaining: Int, acc: RList[T]): RList[T] =
       if nRemaining == 0 then acc
       else
         val index     = Random.nextInt(length)
         val newNumber = apply(index)
-        sampleTailrecDan(nRemaining - 1, newNumber :: acc)
+        recDan(nRemaining - 1, newNumber :: acc)
 
     // Complexity: O(N * K)
     def sampleElegant: RList[T] =
@@ -273,7 +273,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
         .map(index => apply(index))
 
     if n < 0 then RList.empty
-    else sampleTailrec(this, n, RList.empty)
+    else rec(this, n, RList.empty)
 
   override def insertionSort[S >: T](ord: Ordering[S]): RList[S] =
     // Complexity: O(N)
@@ -283,11 +283,11 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else insertSorted(elem, after.head :: before, after.tail)
     // Complexity: O(N^2)
     @tailrec
-    def insertSortTailrec(remaining: RList[T], acc: RList[S]): RList[S]    =
+    def insertSortRec(remaining: RList[T], acc: RList[S]): RList[S]        =
       if remaining.isEmpty then acc
-      else insertSortTailrec(remaining.tail, insertSorted(remaining.head, RList.empty, acc))
+      else insertSortRec(remaining.tail, insertSorted(remaining.head, RList.empty, acc))
 
-    insertSortTailrec(this, RList.empty)
+    insertSortRec(this, RList.empty)
 
   override def mergeSort[S >: T](ord: Ordering[S]): RList[S] =
     // Dan's solution
@@ -349,19 +349,19 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     // Complexity: O(N^2) in the worst case (when the list is sorted)
     // on average O(N 8 log(N))
     @tailrec
-    def quickSortTailrec(remainingLists: RList[RList[T]], acc: RList[RList[T]]): RList[T] =
+    def quickSortRec(remainingLists: RList[RList[T]], acc: RList[RList[T]]): RList[T] =
       if remainingLists.isEmpty then acc.flatMap(identity).reverse
-      else if remainingLists.head.isEmpty then quickSortTailrec(remainingLists.tail, acc)
+      else if remainingLists.head.isEmpty then quickSortRec(remainingLists.tail, acc)
       else if remainingLists.head.tail.isEmpty then
-        quickSortTailrec(remainingLists.tail, remainingLists.head :: acc)
+        quickSortRec(remainingLists.tail, remainingLists.head :: acc)
       else
         val remainingList     = remainingLists.head
         val pivot             = remainingList.head
         val listToSplit       = remainingList.tail
         val (smaller, larger) = partition(listToSplit, pivot, RList.empty, RList.empty)
-        quickSortTailrec(smaller :: (pivot :: RNil) :: larger :: remainingLists.tail, acc)
+        quickSortRec(smaller :: (pivot :: RNil) :: larger :: remainingLists.tail, acc)
 
-    quickSortTailrec(this :: RNil, RList.empty)
+    quickSortRec(this :: RNil, RList.empty)
 
   override def toString: String =
     @tailrec
