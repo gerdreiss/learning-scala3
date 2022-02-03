@@ -31,6 +31,7 @@ sealed abstract class RList[+T]: // our covariant list
   def sample(n: Int): RList[T]
   def insertionSort[S >: T](ord: Ordering[S]): RList[S]
   def mergeSort[S >: T](ord: Ordering[S]): RList[S]
+  def quickSort[S >: T](ord: Ordering[S]): RList[S]
 
 end RList
 
@@ -57,6 +58,7 @@ case object RNil extends RList[Nothing]:
   override def sample(n: Int): RList[Nothing]                          = this
   override def insertionSort[S >: Nothing](ord: Ordering[S]): RList[S] = this
   override def mergeSort[S >: Nothing](ord: Ordering[S]): RList[S]     = this
+  override def quickSort[S >: Nothing](ord: Ordering[S]): RList[S]     = this
 
   override def toString: String = "[]"
 
@@ -121,10 +123,10 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     @tailrec
     def splitAtTailrec(left: RList[T], right: RList[T], count: Int): (RList[T], RList[T]) =
       if count == 0 then (left.reverse, right)
-      else if right.isEmpty then throw ArrayIndexOutOfBoundsException(index)
       else splitAtTailrec(right.head :: left, right.tail, count - 1)
 
-    splitAtTailrec(RList.empty, this, index)
+    if index < 0 || index >= length then throw ArrayIndexOutOfBoundsException(index)
+    else splitAtTailrec(RList.empty, this, index)
 
   override def reverse: RList[T] =
     // this doesn't work - obviously, if you think about it...
@@ -159,17 +161,10 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       if remaining.isEmpty then acc.reverse
       else flatMapTailrecDan(remaining.tail, f(remaining.head).reverse ++ acc)
 
-    // Complexity: O(Z)
-    @tailrec
-    def concatenateAll[S](elements: RList[RList[S]], current: RList[S], acc: RList[S]): RList[S] =
-      if current.isEmpty && elements.isEmpty then acc
-      else if current.isEmpty then concatenateAll(elements.tail, elements.head, acc)
-      else concatenateAll(elements, current.tail, current.head :: acc)
-
     // Complexity: O(N + Z)
     @tailrec
     def betterFlatMap(remaining: RList[T], acc: RList[RList[S]]): RList[S] =
-      if remaining.isEmpty then concatenateAll(acc, RList.empty, RList.empty)
+      if remaining.isEmpty then RList.concatenateAll(acc)
       else betterFlatMap(remaining.tail, f(remaining.head).reverse :: acc)
 
     betterFlatMap(this, RList.empty)
@@ -338,6 +333,36 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     // mergeSortDan(map(_ :: RNil), RNil)
     mergeSortG(this)
 
+  override def quickSort[S >: T](ord: Ordering[S]): RList[S] =
+    @tailrec
+    def partition(
+        list: RList[T],
+        pivot: T,
+        smaller: RList[T],
+        larger: RList[T]
+    ): (RList[T], RList[T]) =
+      if list.isEmpty then (smaller, larger)
+      else if ord.lteq(list.head, pivot) then
+        partition(list.tail, pivot, list.head :: smaller, larger)
+      else partition(list.tail, pivot, smaller, list.head :: larger)
+
+    // Complexity: O(N^2) in the worst case (when the list is sorted)
+    // on average O(N 8 log(N))
+    @tailrec
+    def quickSortTailrec(remainingLists: RList[RList[T]], acc: RList[RList[T]]): RList[T] =
+      if remainingLists.isEmpty then acc.flatMap(identity).reverse
+      else if remainingLists.head.isEmpty then quickSortTailrec(remainingLists.tail, acc)
+      else if remainingLists.head.tail.isEmpty then
+        quickSortTailrec(remainingLists.tail, remainingLists.head :: acc)
+      else
+        val remainingList     = remainingLists.head
+        val pivot             = remainingList.head
+        val listToSplit       = remainingList.tail
+        val (smaller, larger) = partition(listToSplit, pivot, RList.empty, RList.empty)
+        quickSortTailrec(smaller :: (pivot :: RNil) :: larger :: remainingLists.tail, acc)
+
+    quickSortTailrec(this :: RNil, RList.empty)
+
   override def toString: String =
     @tailrec
     def toStringTailrec(remaining: RList[T], result: String): String =
@@ -365,6 +390,17 @@ object RList:
       else fromTailrec(remaining.drop(1), remaining.head :: acc)
 
     fromTailrec(iterable, RList.empty)
+
+  def concatenateAll[T](lists: RList[RList[T]]): RList[T] =
+    @tailrec
+    def concatenateAll[S](elements: RList[RList[S]], current: RList[S], acc: RList[S]): RList[S] =
+      if current.isEmpty && elements.isEmpty then acc
+      else if current.isEmpty then concatenateAll(elements.tail, elements.head, acc)
+      else concatenateAll(elements, current.tail, current.head :: acc)
+
+    concatenateAll(lists, empty, empty)
+
+end RList
 
 object ListProblems extends App:
   val len = 10000
@@ -399,7 +435,7 @@ object ListProblems extends App:
   // println(lapse)
 
   println("-" * 100)
-  val rleList         = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
+  val rleList = 1 :: 1 :: 2 :: 3 :: 3 :: 5 :: 6 :: 6 :: 6 :: 6 :: RNil
   println(rleList)
   println(rleList.rle)
   println("-" * 100)
@@ -410,10 +446,13 @@ object ListProblems extends App:
   println(smallList.sample(20))
   println(largeList.sample(50))
   println("-" * 100)
+
+  private val value: Ordering[Int] = Ordering.fromLessThan(_ < _)
+
   val unsortedList    = 10 :: 3 :: 30 :: 100 :: 3 :: 1 :: 2 :: RNil
-  println(unsortedList)
-  println(unsortedList.insertionSort(Ordering.fromLessThan(_ < _)))
   val anotherUnsorted = largeList.sample(20)
-  println(anotherUnsorted)
-  println(anotherUnsorted.insertionSort(Ordering.fromLessThan(_ < _)))
-  println(anotherUnsorted.mergeSort(Ordering.fromLessThan(_ < _)))
+
+  println(s"Unsorted       : $anotherUnsorted")
+  println(s"Insertion sort : ${anotherUnsorted.insertionSort(value)}")
+  println(s"Merge sort     : ${anotherUnsorted.mergeSort(value)}")
+  println(s"Quick sort     : ${anotherUnsorted.quickSort(value)}")
