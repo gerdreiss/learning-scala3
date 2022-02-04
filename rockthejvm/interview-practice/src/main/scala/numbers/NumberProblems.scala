@@ -3,7 +3,8 @@ package numbers
 import scala.annotation.tailrec
 
 def isPrimeG(n: Int): Boolean =
-  n > 1 && (2 to math.sqrt(n).toInt).forall(x => n % x != 0)
+  val maxDiv = math.sqrt(n).toInt
+  n > 1 && (2 to maxDiv).forall(x => n % x != 0)
 
 def isPrimeDan(n: Int): Boolean =
   // Complexity: O(sqrt(N))
@@ -29,7 +30,7 @@ def decomposeDan(n: Int): List[Int] =
       rec(remainder / currentDiv, currentDiv, currentDiv :: acc)
     else rec(remainder, currentDiv + 1, acc)
 
-  rec(n, 2, List.empty).sorted.filter(_ > 1)
+  rec(n, 2, List.empty).filter(_ > 1).sorted
 
 extension (n: Int)
   def isPrime: Boolean =
@@ -43,7 +44,7 @@ extension (n: Int)
         rec(remainder / currentDiv, currentDiv, currentDiv :: acc)
       else rec(remainder, currentDiv + 1, acc)
 
-    rec(n, 2, List.empty).sorted.filter(_ > 1)
+    rec(n, 2, List.empty).filter(_ > 1).sorted
 
 object NumberProblems extends App:
 
