@@ -1,10 +1,7 @@
 package lists
 
-import org.graalvm.compiler.core.common.`type`.ArithmeticOpTable.BinaryOp.Rem
-
 import java.util as ju
 import scala.annotation.tailrec
-import scala.jdk.FunctionWrappers.RichToLongFunctionAsFunction1
 import scala.util.Random
 
 sealed abstract class RList[+T]: // our covariant list
