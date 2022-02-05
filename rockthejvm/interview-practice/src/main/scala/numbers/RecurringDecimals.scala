@@ -47,14 +47,14 @@ def fractionToRecurringDecimals(numerator: Int, denominator: Int): String =
 
 object RecurringDecimals extends App:
 
-  println(f" 1/3    =  ${(BigDecimal(1.0) / BigDecimal(3.0)).formatted("%.100f")}")
-  println(f" 1/2    =  ${(BigDecimal(1.0) / BigDecimal(2.0)).formatted("%.100f")}")
-  println(f" 1/6    =  ${(BigDecimal(1.0) / BigDecimal(6.0)).formatted("%.100f")}")
-  println(f" 1/333  =  ${(BigDecimal(1.0) / BigDecimal(333.0)).formatted("%.100f")}")
-  println(f" 1/7    =  ${(BigDecimal(1.0) / BigDecimal(7.0)).formatted("%.100f")} ")
-  println(f" 1/2003 =  ${(BigDecimal(1.0) / BigDecimal(2003.0)).formatted("%.100f")}")
-  println(f"-1/2    = ${(BigDecimal(-1.0) / BigDecimal(2.0)).formatted("%.100f")}")
-  println("-" * 100)
+  println(f" 1/3    =  ${(BigDecimal(1.0) / BigDecimal(3.0)).formatted("%.37f")}")
+  println(f" 1/2    =  ${(BigDecimal(1.0) / BigDecimal(2.0)).formatted("%.37f")}")
+  println(f" 1/6    =  ${(BigDecimal(1.0) / BigDecimal(6.0)).formatted("%.37f")}")
+  println(f" 1/333  =  ${(BigDecimal(1.0) / BigDecimal(333.0)).formatted("%.37f")}")
+  println(f" 1/7    =  ${(BigDecimal(1.0) / BigDecimal(7.0)).formatted("%.37f")} ")
+  println(f" 1/2003 =  ${(BigDecimal(1.0) / BigDecimal(2003.0)).formatted("%.37f")}")
+  println(f"-1/2    = ${(BigDecimal(-1.0) / BigDecimal(2.0)).formatted("%.37f")}")
+  println("=" * 100)
   println(s" 1/3    = ${fractionToRecurringDecimals(1, 3)}")
   println(s" 1/2    = ${fractionToRecurringDecimals(1, 2)}")
   println(s" 4/2    = ${fractionToRecurringDecimals(4, 2)}")
