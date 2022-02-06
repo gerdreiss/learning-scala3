@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 object CountChars extends App:
 
   def solutionG(s: String): Map[Char, Int] =
-    s.groupBy(identity).mapValues(_.length).toMap
+    s.groupBy(identity).view.mapValues(_.length).toMap
 
   def solutionDan(s: String): Map[Char, Int] =
     @tailrec
@@ -17,6 +17,8 @@ object CountChars extends App:
       else rec(remaining.tail, acc + (remaining.head -> 1))
 
     rec(s)
+
+  end solutionDan
 
   println(solutionDan("Scala"))
   println(solutionG("Scala"))
