@@ -26,6 +26,23 @@ def hasValidParensDan(s: String): Boolean =
 
   rec(s)
 
+def generateParens(n: Int): List[String] =
+  @tailrec
+  def rec(rem: Int, acc: Set[String] = Set("()")): Set[String] =
+    if rem == 0 then acc
+    else
+      val newStrings = for
+        s   <- acc
+        idx <- s.indices
+      yield
+        val (before, after) = s.splitAt(idx)
+        s"$before()$after"
+
+      rec(rem - 1, newStrings)
+
+  if n == 0 then List.empty
+  else rec(n).toList
+
 object ValidParentheses extends App:
 
   println(hasValidParensG("(())"))
@@ -33,3 +50,8 @@ object ValidParentheses extends App:
 
   println(hasValidParensDan("(())"))
   println(hasValidParensDan("()(()"))
+
+  println(generateParens(1))
+  println(generateParens(2))
+  println(generateParens(3))
+  println(generateParens(10))
