@@ -23,10 +23,10 @@ object Justify extends App:
         line: String = "",
         lines: List[String] = List.empty
     ): List[String] =
-      if words.isEmpty then lines
-      else if line.length + words.head.length + 1 <= width then
+      if words.isEmpty then lines :+ line
+      else if line.length + words.head.length <= width then
         rec(words.tail, s"$line ${words.head}", lines)
-      else rec(words, "", lines :+ line.trim) // justifyLine(line.trim, width - line.trim.length))
+      else rec(words, "", lines :+ justifyLine(line.trim, width - line.trim.length))
 
     rec(text.words)
 
@@ -126,5 +126,6 @@ object Justify extends App:
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
   // println(justifyLine("Lorem ipsum dolor sit amet", 4))
-  // solutionG(text, 15).foreach(println)
-  println(solutionDan2(text, 50))
+  println(solutionDan2(text, 10))
+  println("-" * 100)
+  solutionG(text, 10).foreach(println)
