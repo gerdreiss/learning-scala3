@@ -2,7 +2,7 @@ package strings
 
 import scala.annotation.tailrec
 
-object Justify extends App:
+object JustifyText extends App:
 
   extension (s: String)
     def words: List[String] =
@@ -32,53 +32,47 @@ object Justify extends App:
 
   end solutionG
 
-  def solutionDan(text: String, width: Int): String =
-    @tailrec
-    def pack(
-        words: List[String],
-        currentRow: List[String] = List.empty,
-        currentLen: Int = 0,
-        result: List[List[String]] = List.empty
-    ): List[List[String]] =
-      if words.isEmpty && currentRow.isEmpty then result
-      else if words.isEmpty then result :+ currentRow
-      else if currentRow.isEmpty && words.head.length > width then
-        val (here, there) = words.head.splitAt(width - 2)
-        pack(there :: words.tail, List.empty, 0, result :+ List(here + "-"))
-      else if words.head.length + currentLen > width then
-        pack(words, List.empty, 0, result :+ currentRow)
-      else pack(words.tail, currentRow :+ words.head, currentLen + 1 + words.head.length, result)
+  def solutionDanRewritten(text: String, width: Int): String =
+    type Words = List[String]
+    type Lines = List[Words]
 
-    def justify(row: List[String]): String =
+    def pack(words: Words, currentRow: Words, result: Lines): Lines =
+      if words.isEmpty && currentRow.isEmpty then result
+      else if currentRow.nonEmpty then result :+ currentRow
+      else if currentRow.isEmpty && words.head.length > width then
+        pack(
+          words.head.drop(width - 1) :: words.tail,
+          List.empty,
+          result :+ List(words.head.take(width - 1) + "-")
+        )
+      else if currentRow.length + 1 + words.head.length > width then
+        pack(words, List.empty, result :+ currentRow)
+      else pack(words.tail, currentRow :+ words.head, result)
+
+    def justifyRow(row: List[String]): String =
       if row.length == 1 then row.head
       else
-        val nSpacesAvailable  = width - row.map(_.length).sum
-        val nIntervals        = row.length - 1
-        val spacesPerInterval = nSpacesAvailable / nIntervals
-        val nExtraSpaces      = nSpacesAvailable % nIntervals
-        val regularSpace      = " " * spacesPerInterval
-        val biggerSpace       = " " * (spacesPerInterval + 1)
+        val nSpacesAvailable   = width - row.map(_.length).sum
+        val nIntervals         = row.length - 1
+        val nSpacesPerInterval = nSpacesAvailable / nIntervals
+        val nExtraSpaces       = nSpacesAvailable % nIntervals
+        val regularSpace       = " " * nSpacesPerInterval
+        val biggerSpace        = " " * (nSpacesPerInterval + 1)
 
         if nExtraSpaces == 0 then row.mkString(regularSpace)
         else
           val nWordsWithBiggerIntervals = nExtraSpaces + 1
-          val wordsWithBiggerIntervals  = row.take(nWordsWithBiggerIntervals)
-          val firstPart                 = wordsWithBiggerIntervals.mkString(biggerSpace)
+          val firstPart                 = row.take(nWordsWithBiggerIntervals).mkString(biggerSpace)
           val secondPart                = row.drop(nWordsWithBiggerIntervals).mkString(regularSpace)
 
-          firstPart + regularSpace + secondPart
+          firstPart + " " + secondPart
 
-    // split text into words
-    // pack the words into rows
-    val words       = text.split(" ").toList
-    val unjustified = pack(words)
-    val justified   = unjustified.init.map(justify) :+ unjustified.last.mkString(" ")
+    val unjustifiedRows = pack(text.words, List.empty, List.empty)
+    val justifiedRows   = unjustifiedRows.init.map(justifyRow) :+ unjustifiedRows.head
 
-    justified.mkString("\n")
+    justifiedRows.mkString("\n")
 
-  end solutionDan
-
-  def solutionDan2(text: String, width: Int): String =
+  def solutionDan(text: String, width: Int): String =
     @tailrec
     def pack(
         words: List[String],
@@ -120,12 +114,11 @@ object Justify extends App:
 
     justifiedRows.mkString("\n")
 
-  end solutionDan2
+  end solutionDan
 
   val text =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
-  // println(justifyLine("Lorem ipsum dolor sit amet", 4))
-  println(solutionDan2(text, 10))
-  println("-" * 100)
-  solutionG(text, 10).foreach(println)
+  println(solutionDan(text, 50))
+  println("=" * 100)
+  println(solutionDanRewritten(text, 10))
