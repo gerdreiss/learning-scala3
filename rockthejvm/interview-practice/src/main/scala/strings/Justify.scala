@@ -78,9 +78,53 @@ object Justify extends App:
 
   end solutionDan
 
+  def solutionDan2(text: String, width: Int): String =
+    @tailrec
+    def pack(
+        words: List[String],
+        currentRow: List[String],
+        currentCharCount: Int,
+        result: List[List[String]]
+    ): List[List[String]] =
+      if words.isEmpty && currentRow.isEmpty then result
+      else if words.isEmpty then result :+ currentRow
+      else if currentRow.isEmpty && words.head.length > width then
+        val (partOnThisRow, partOnNextRow) = words.head.splitAt(width - 2)
+        pack(partOnNextRow :: words.tail, List.empty, 0, result :+ List(partOnThisRow + "-"))
+      else if words.head.length + currentCharCount > width then
+        pack(words, List.empty, 0, result :+ currentRow)
+      else
+        pack(words.tail, currentRow :+ words.head, currentCharCount + 1 + words.head.length, result)
+
+    def justifyRow(row: List[String]): String =
+      if row.length == 1 then row.head
+      else
+        val nSpacesAvailable   = width - row.map(_.length).sum
+        val nIntervals         = row.length - 1
+        val nSpacesPerInterval = nSpacesAvailable / nIntervals
+        val nExtraSpaces       = nSpacesAvailable % nIntervals
+        val regularSpace       = " " * nSpacesPerInterval
+        val biggerSpace        = " " * (nSpacesPerInterval + 1)
+
+        if nExtraSpaces == 0 then row.mkString(regularSpace)
+        else
+          val nWordsWithBiggerIntervals = nExtraSpaces + 1
+          val firstPart                 = row.take(nWordsWithBiggerIntervals).mkString(biggerSpace)
+          val secondPart                = row.drop(nWordsWithBiggerIntervals).mkString(regularSpace)
+
+          firstPart + " " + secondPart
+
+    val words           = text.split(" ").toList
+    val unjustifiedRows = pack(words, List.empty, 0, List.empty)
+    val justifiedRows   = unjustifiedRows.map(justifyRow)
+
+    justifiedRows.mkString("\n")
+
+  end solutionDan2
+
   val text =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
   // println(justifyLine("Lorem ipsum dolor sit amet", 4))
-  // solutionDan(text, 15).foreach(println)
-  solutionG(text, 15).foreach(println)
+  // solutionG(text, 15).foreach(println)
+  println(solutionDan2(text, 50))
