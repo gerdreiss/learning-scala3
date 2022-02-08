@@ -4,18 +4,24 @@ import scala.annotation.tailrec
 
 object MultiplyStrings extends App:
 
+  /**
+   * My solution
+   */
+
   extension (s: String)
     def prepend0(len: Int): String =
       if s.length == len then s else "0" * (len - s.length) + s
 
     def add(t: String): String =
       val maxLength       = s.length max t.length
-      val (carry, result) = (s.prepend0(maxLength) zip t.prepend0(maxLength)).reverse
-        .foldLeft((0, "")) { case ((carry, acc), (left, right)) =>
-          val result = left.asDigit + right.asDigit + carry
+      val (carry, result) = (s.prepend0(maxLength) zip t.prepend0(maxLength))
+        .map((left, right) => left.asDigit + right.asDigit)
+        .reverse
+        .foldLeft((0, "")) { case ((carry, acc), sum) =>
+          val result = sum + carry
           (result / 10, (result % 10) + acc)
         }
-      if carry == 0 then result else carry + result
+      if carry == 0 then result else s"$carry$result"
 
     def multiply(n: Int): String =
       if n == 0 then "0"
@@ -27,6 +33,10 @@ object MultiplyStrings extends App:
       .zipWithIndex
       .map((d, idx) => a.multiply(d) + ("0" * idx))
       .reduce(_ add _)
+
+  /**
+   * Dan's solution
+   */
 
   def solutionDan(a: String, b: String): String =
     def multiplyByDigit(number: List[Int], factor: Int): List[Int] =
