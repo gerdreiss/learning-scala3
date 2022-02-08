@@ -5,7 +5,8 @@ object ReorganizeString extends App:
   /**
    * Rearrange string so that no two adjucent characters are identical
    */
-
+  // complexity: O(N^2) time
+  // Better complexity: use TreeMap
   def solution(s: String): String =
     def recurse(charCount: Map[Char, Int], currentChar: Char = '\u0000', acc: String = ""): String =
       if charCount.isEmpty then acc
