@@ -50,9 +50,8 @@ object MultiplyStrings extends App:
           if carry == 0 then acc.reverse
           else (carry :: acc).reverse
         else
-          val newDigit   = remainingDigits.head
-          val newProduct = newDigit * factor + carry
-          rec(remainingDigits.tail, newProduct / 10, (newDigit % 10) :: acc)
+          val newProduct = remainingDigits.head * factor + carry
+          rec(remainingDigits.tail, newProduct / 10, (newProduct % 10) :: acc)
 
       rec(number)
 
