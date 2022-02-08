@@ -2,9 +2,9 @@ package strings
 
 object CompareVersionNumbers extends App:
 
-  def ext(version: String, numDots: Int): String =
-    val currNumDots = version.count(_ == '.')
-    version + (".0" * (numDots - currNumDots))
+  def ext(version: String, numDots: Int, numDotsMax: Int): String =
+    if numDots == numDotsMax then version
+    else version + (".0" * (numDotsMax - numDots))
 
   def num(version: String): Int =
     version
@@ -19,8 +19,13 @@ object CompareVersionNumbers extends App:
 
   // compare software versions
   def solutionG(version1: String, version2: String): Int =
-    val numDots = version1.count(_ == '.') max version2.count(_ == '.')
-    num(ext(version1, numDots)).compareTo(num(ext(version2, numDots)))
+    val numDotsV1  = version1.count(_ == '.')
+    val numDotsV2  = version2.count(_ == '.')
+    val numDotsMax = numDotsV1 max numDotsV2
+    val v1         = ext(version1, numDotsV1, numDotsMax)
+    val v2         = ext(version2, numDotsV2, numDotsMax)
+
+    num(v1) compareTo num(v2)
 
   def solutionDan(version1: String, version2: String): Int =
     def compare(rev1: List[Int], rev2: List[Int]): Int =
