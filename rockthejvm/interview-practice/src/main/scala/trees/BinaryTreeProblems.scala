@@ -21,3 +21,7 @@ object BinaryTreeProblems extends App:
 
   println(tree.leafCount)
   println(tree.collectLeaves)
+  println(tree.size)
+
+  val degenerate = (1 to 10000000).foldLeft[BTree[Int]](BEnd)((tree, n) => BNode(n, tree, BEnd))
+  println(degenerate.size) // if size were a def , this would blow up with StackOverflowError
