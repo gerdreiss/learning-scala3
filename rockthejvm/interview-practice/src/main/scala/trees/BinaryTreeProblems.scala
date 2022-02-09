@@ -19,9 +19,16 @@ object BinaryTreeProblems extends App:
     )
     // @formatter:on
 
-  println(tree.leafCount)
-  println(tree.collectLeaves)
-  println(tree.size)
+  // println(tree.leafCount)
+  // println(tree.collectLeaves)
+  // println(tree.size)
 
-  val degenerate = (1 to 10000000).foldLeft[BTree[Int]](BEnd)((tree, n) => BNode(n, tree, BEnd))
-  println(degenerate.size) // if size were a def , this would blow up with StackOverflowError
+  // val degenerate = (1 to 10000000).foldLeft[BTree[Int]](BEnd)((tree, n) => BNode(n, tree, BEnd))
+  // if size were a def , this would blow up with StackOverflowError
+  // println(degenerate.size)
+
+  println(tree.collectNodes(0).map(_.value))
+  println(tree.collectNodes(1).map(_.value))
+  println(tree.collectNodes(2).map(_.value))
+  println(tree.collectNodes(3).map(_.value))
+  println(tree.collectNodes(10).map(_.value))
