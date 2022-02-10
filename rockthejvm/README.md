@@ -7,6 +7,7 @@ using
   - [Doobie Tutorial](https://www.youtube.com/watch?v=SvFL7c6F9xI)
   - [Doobie Tutorial, Part 2](https://www.youtube.com/watch?v=9xgOQh-Ppao)
   - [Http4s Tutorial](https://www.youtube.com/watch?v=v_gv6LsWdT0)
+  - [FS2 Streams Tutorial](https://www.youtube.com/watch?v=XCpGtaJjkVY)
 - Rock the JVM's [Udemy courses](https://www.udemy.com/user/daniel-ciocirlan/)
   - [Advanced Scala and Functional Programming](https://www.udemy.com/course/advanced-scala)
 - Rock the JVM's [Courses](https://www.rockthejvm.com/courses)

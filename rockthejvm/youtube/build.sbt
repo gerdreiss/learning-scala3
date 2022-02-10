@@ -5,6 +5,7 @@ val typenameVersion = "1.0.0"
 val newTypeVersion  = "0.4.4"
 val http4sVersion   = "1.0.0-M31"
 val circeVersion    = "0.15.0-M1"
+val fs2Version      = "3.2.4"
 
 lazy val root = project
   .in(file("."))
@@ -23,6 +24,7 @@ lazy val root = project
       "org.http4s"   %% "http4s-blaze-server" % http4sVersion,
       "org.http4s"   %% "http4s-circe"        % http4sVersion,
       "org.http4s"   %% "http4s-dsl"          % http4sVersion,
-      "io.circe"     %% "circe-generic"       % circeVersion
+      "io.circe"     %% "circe-generic"       % circeVersion,
+      "co.fs2"       %% "fs2-core"            % fs2Version
     )
   )
