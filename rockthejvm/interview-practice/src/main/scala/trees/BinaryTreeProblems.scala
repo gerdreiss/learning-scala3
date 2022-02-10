@@ -2,33 +2,47 @@ package trees
 
 object BinaryTreeProblems extends App:
 
+  // @formatter:off
   val tree =
-    // @formatter:off
     BNode(1,
       BNode(2, 
-        BNode(3, BEnd, BEnd), 
+        BNode(3, BEmpty, BEmpty), 
         BNode(4, 
-          BEnd, 
-          BNode(5, BEnd, BEnd)
+          BEmpty, 
+          BNode(5, BEmpty, BEmpty)
         )
       ),
       BNode(6, 
-        BNode(7, BEnd, BEnd), 
-        BNode(8, BEnd, BEnd)
+        BNode(7, BEmpty, BEmpty), 
+        BNode(8, BEmpty, BEmpty)
+      )
+    )
+  val tree2 =
+    BNode(1,
+      BNode(2, 
+        BNode(3, BEmpty, BEmpty), 
+        BNode(4, 
+          BNode(5, BEmpty, BEmpty), 
+          BNode(6, BEmpty, BEmpty)
+        )
+      ),
+      BNode(7, 
+        BNode(8, BEmpty, BEmpty), 
+        BNode(9, BEmpty, BEmpty)
       )
     )
   val mirrored =
     BNode(1,
       BNode(6, 
-        BNode(8, BEnd, BEnd),
-        BNode(7, BEnd, BEnd)
+        BNode(8, BEmpty, BEmpty),
+        BNode(7, BEmpty, BEmpty)
       ),
       BNode(2, 
         BNode(4, 
-          BNode(5, BEnd, BEnd),
-          BEnd
+          BNode(5, BEmpty, BEmpty),
+          BEmpty
         ),
-        BNode(3, BEnd, BEnd)
+        BNode(3, BEmpty, BEmpty)
       )
     )
     // @formatter:on
@@ -55,4 +69,4 @@ object BinaryTreeProblems extends App:
 
   println("=" * 100)
   println(tree.sameShapeAs(tree))
-  println(tree.sameShapeAs(mirrored))
+  println(tree.sameShapeAs(tree2))

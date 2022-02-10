@@ -15,31 +15,21 @@ sealed trait BTree[+T]:
   def collectNodes(level: Int): List[BTree[T]]
   def mirror: BTree[T]
   def sameShapeAs[S >: T](that: BTree[S]): Boolean
+  def isSymmetrical: Boolean = sameShapeAs(mirror)
 end BTree
 
-case object BEnd extends BTree[Nothing]:
-
+case object BEmpty extends BTree[Nothing]:
   override def value: Nothing = throw NoSuchElementException()
-
   override def left: BTree[Nothing] = throw NoSuchElementException()
-
   override def right: BTree[Nothing] = throw NoSuchElementException()
-
   override val isEmpty: Boolean = true
-
   override val isLeaf: Boolean = false
-
   override val size: Int = 0
-
   override def collectLeaves: List[BTree[Nothing]] = List.empty
-
   override def collectNodes(level: Int): List[BTree[Nothing]] = List.empty
-
   override val mirror: BTree[Nothing] = this
-
   override def sameShapeAs[S >: Nothing](that: BTree[S]): Boolean = that.isEmpty
-
-end BEnd
+end BEmpty
 
 case class BNode[+T](
     override val value: T,
@@ -98,7 +88,7 @@ case class BNode[+T](
       else
         val expandedNodes =
           for
-            node  <- currentNodes
+            node <- currentNodes
             child <- List(node.left, node.right) if !child.isEmpty
           yield child
 
@@ -125,7 +115,7 @@ case class BNode[+T](
           recurseDan(node.left :: node.right :: todo, visited + node, done)
         else
           val (newLeft :: newRight :: _) = done
-          val newNode                    = BNode(node.value, newLeft, newRight)
+          val newNode = BNode(node.value, newLeft, newRight)
           recurseDan(todo.tail, visited, newNode :: done.drop(2))
 
     // my implementation, elegant but stack unsafe -
@@ -138,7 +128,7 @@ case class BNode[+T](
   end mirror
 
   override def sameShapeAs[S >: T](that: BTree[S]): Boolean =
-    // sorting needs to be considered here
+
     @tailrec
     def recurseG(these: List[BTree[S]], those: List[BTree[S]]): Boolean =
       if these.length != those.length then false
@@ -146,6 +136,7 @@ case class BNode[+T](
       else
         val nextLevelOfThese = these.filterNot(_.isEmpty).flatMap(n => List(n.left, n.right))
         val nextLevelOfThose = those.filterNot(_.isEmpty).flatMap(n => List(n.left, n.right))
+
         recurseG(nextLevelOfThese, nextLevelOfThese)
 
     @tailrec
@@ -160,7 +151,7 @@ case class BNode[+T](
         else if thisNode.isLeaf then thatNode.isLeaf && recurseDan(these.tail, those.tail)
         else
           recurseDan(
-            thisNode.left :: thatNode.right :: these.tail,
+            thisNode.left :: thisNode.right :: these.tail,
             thatNode.left :: thatNode.right :: those.tail
           )
 
