@@ -6,43 +6,43 @@ object BinaryTreeProblems extends App:
   val tree =
     BNode(1,
       BNode(2, 
-        BNode(3, BEmpty, BEmpty), 
+        BNode(3), 
         BNode(4, 
           BEmpty, 
-          BNode(5, BEmpty, BEmpty)
+          BNode(5)
         )
       ),
       BNode(6, 
-        BNode(7, BEmpty, BEmpty), 
-        BNode(8, BEmpty, BEmpty)
+        BNode(7), 
+        BNode(8)
       )
     )
   val tree2 =
     BNode(1,
       BNode(2, 
-        BNode(3, BEmpty, BEmpty), 
+        BNode(3), 
         BNode(4, 
-          BNode(5, BEmpty, BEmpty), 
-          BNode(6, BEmpty, BEmpty)
+          BNode(5), 
+          BNode(6)
         )
       ),
       BNode(7, 
-        BNode(8, BEmpty, BEmpty), 
-        BNode(9, BEmpty, BEmpty)
+        BNode(8), 
+        BNode(9)
       )
     )
   val mirrored =
     BNode(1,
       BNode(6, 
-        BNode(8, BEmpty, BEmpty),
-        BNode(7, BEmpty, BEmpty)
+        BNode(8),
+        BNode(7)
       ),
       BNode(2, 
         BNode(4, 
-          BNode(5, BEmpty, BEmpty),
+          BNode(5),
           BEmpty
         ),
-        BNode(3, BEmpty, BEmpty)
+        BNode(3)
       )
     )
     // @formatter:on

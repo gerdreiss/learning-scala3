@@ -33,8 +33,8 @@ end BEmpty
 
 case class BNode[+T](
     override val value: T,
-    override val left: BTree[T],
-    override val right: BTree[T]
+    override val left: BTree[T] = BEmpty,
+    override val right: BTree[T] = BEmpty
 ) extends BTree[T]:
 
   override def isEmpty: Boolean = false
