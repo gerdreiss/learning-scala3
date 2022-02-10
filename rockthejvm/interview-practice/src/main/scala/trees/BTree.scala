@@ -14,6 +14,7 @@ sealed trait BTree[+T]:
   def leafCount: Int = collectLeaves.length
   def collectNodes(level: Int): List[BTree[T]]
   def mirror: BTree[T]
+  def sameShapeAs[S >: T](that: BTree[S]): Boolean
 end BTree
 
 case object BEnd extends BTree[Nothing]:
@@ -35,6 +36,8 @@ case object BEnd extends BTree[Nothing]:
   override def collectNodes(level: Int): List[BTree[Nothing]] = List.empty
 
   override val mirror: BTree[Nothing] = this
+
+  override def sameShapeAs[S >: Nothing](that: BTree[S]): Boolean = that.isEmpty
 
 end BEnd
 
@@ -62,7 +65,7 @@ case class BNode[+T](
   //       recurseG(node.left :: node.right :: nodes.tail, acc + 1)
   //   recurse(List(this))
 
-  // or... just make it a val
+  // or... just make it a val AND recursive
   override val size: Int = 1 + left.size + right.size
 
   override def collectLeaves: List[BTree[T]] =
@@ -121,14 +124,46 @@ case class BNode[+T](
         else if !visited.contains(node) then
           recurseDan(node.left :: node.right :: todo, visited + node, done)
         else
-          val newLeft  = done.head
-          val newRight = done.tail.head
-          val newNode  = BNode(node.value, newLeft, newRight)
+          val (newLeft :: newRight :: _) = done
+          val newNode                    = BNode(node.value, newLeft, newRight)
           recurseDan(todo.tail, visited, newNode :: done.drop(2))
 
     // my implementation, elegant but stack unsafe -
     // blows up with StackOverflowError if the tree is large enough
     // this.copy(left = right.mirror, right = left.mirror)
-    recurseDan(List(this), Set.empty, List.empty)
+    // For some reason, this blows up too. Too lazy right now to find out why...
+    // recurseDan(List(this), Set.empty, List.empty)
+    this
+
+  end mirror
+
+  override def sameShapeAs[S >: T](that: BTree[S]): Boolean =
+    // sorting needs to be considered here
+    @tailrec
+    def recurseG(these: List[BTree[S]], those: List[BTree[S]]): Boolean =
+      if these.length != those.length then false
+      else if these.forall(_.isLeaf) && those.forall(_.isLeaf) then true
+      else
+        val nextLevelOfThese = these.filterNot(_.isEmpty).flatMap(n => List(n.left, n.right))
+        val nextLevelOfThose = those.filterNot(_.isEmpty).flatMap(n => List(n.left, n.right))
+        recurseG(nextLevelOfThese, nextLevelOfThese)
+
+    @tailrec
+    def recurseDan(these: List[BTree[S]], those: List[BTree[S]]): Boolean =
+      if these.isEmpty then those.isEmpty
+      else if those.isEmpty then these.isEmpty
+      else
+        val thisNode = these.head
+        val thatNode = those.head
+
+        if thisNode.isEmpty then thatNode.isEmpty && recurseDan(these.tail, those.tail)
+        else if thisNode.isLeaf then thatNode.isLeaf && recurseDan(these.tail, those.tail)
+        else
+          recurseDan(
+            thisNode.left :: thatNode.right :: these.tail,
+            thatNode.left :: thatNode.right :: those.tail
+          )
+
+    recurseDan(List(this), List(that))
 
 end BNode

@@ -17,6 +17,20 @@ object BinaryTreeProblems extends App:
         BNode(8, BEnd, BEnd)
       )
     )
+  val mirrored =
+    BNode(1,
+      BNode(6, 
+        BNode(8, BEnd, BEnd),
+        BNode(7, BEnd, BEnd)
+      ),
+      BNode(2, 
+        BNode(4, 
+          BNode(5, BEnd, BEnd),
+          BEnd
+        ),
+        BNode(3, BEnd, BEnd)
+      )
+    )
     // @formatter:on
 
   // println(tree.leafCount)
@@ -35,6 +49,10 @@ object BinaryTreeProblems extends App:
   // println(tree.collectNodes(3).map(_.value))
   // println(tree.collectNodes(10).map(_.value))
 
-  println(tree)
+  // println("=" * 100)
+  // println(tree)
+  // println(tree.mirror)
+
   println("=" * 100)
-  println(tree.mirror)
+  println(tree.sameShapeAs(tree))
+  println(tree.sameShapeAs(mirrored))
