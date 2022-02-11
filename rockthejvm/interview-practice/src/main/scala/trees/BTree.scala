@@ -117,7 +117,7 @@ case class BNode[+T](
         else if !visited.contains(node) then
           recurseDan(node.left :: node.right :: todo, visited + node, done)
         else
-          val (newLeft :: newRight :: _) = done
+          val newLeft :: newRight :: _ = done
           val newNode = BNode(node.value, newLeft, newRight)
           recurseDan(todo.tail, visited, newNode :: done.drop(2))
 
