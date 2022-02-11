@@ -51,7 +51,9 @@ object BinaryTreeProblems extends App:
   // println(tree.collectLeaves)
   // println(tree.size)
 
-  // val degenerate = (1 to 10000000).foldLeft[BTree[Int]](BEnd)((tree, n) => BNode(n, tree, BEnd))
+  // val degenerate = (1 to 10000000).foldLeft[BTree[Int]](BEmpty)((tree, n) => BNode(n, tree, BEmpty))
+  // val degenerate2 =
+  //  (1 to 10000000).foldRight[BTree[Int]](BEmpty)((n, tree) => BNode(n, tree, BEmpty))
   // if size were a def , this would blow up with StackOverflowError
   // println(degenerate.size)
   // this does blow up independent of being a val or a def, if implemented stack recursively
@@ -67,6 +69,7 @@ object BinaryTreeProblems extends App:
   // println(tree)
   // println(tree.mirror)
 
-  println("=" * 100)
-  println(tree.sameShapeAs(tree))
-  println(tree.sameShapeAs(tree2))
+  // println("=" * 100)
+  // println(tree.sameShapeAs(tree))
+  // println(tree.sameShapeAs(tree2))
+  println(tree.toList)
