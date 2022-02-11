@@ -67,9 +67,7 @@ case class BNode[+T](
       if todo.isEmpty then leaves
       else if todo.head.isEmpty then collectRecursively(todo.tail, leaves)
       else if todo.head.isLeaf then collectRecursively(todo.tail, todo.head :: leaves)
-      else
-        val node = todo.head
-        collectRecursively(node.left :: node.right :: todo.tail, leaves)
+      else collectRecursively(todo.head.left :: todo.head.right :: todo.tail, leaves)
 
     collectRecursively(List(this), List.empty)
 
@@ -102,7 +100,7 @@ case class BNode[+T](
 
   end collectNodes
 
-  override val mirror: BTree[T] =
+  override def mirror: BTree[T] =
     // Complexity: O(N)
     @tailrec
     def recurseDan(
