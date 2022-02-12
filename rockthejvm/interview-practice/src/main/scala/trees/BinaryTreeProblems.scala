@@ -90,6 +90,8 @@ object BinaryTreeProblems extends App:
   // println(PathSum.hasPathSumTailrec(Queue(tree), Queue(7)))
   // println(PathSum.hasPathSumTailrec(Queue(degenerate), Queue(100)))
 
-  println("=" * 100)
-  println(PathSum.findSumPaths(tree, 6))
-  println(PathSum.findSumPaths(tree, 14))
+  //println("=" * 100)
+  //println(PathSum.findSumPaths(tree, 6))
+  //println(PathSum.findSumPaths(tree, 14))
+  
+  
