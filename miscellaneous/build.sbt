@@ -1,4 +1,4 @@
-val scala3Version = "3.1.0"
+val scala3Version = "3.1.1"
 
 lazy val root = project
   .in(file("."))
@@ -9,6 +9,7 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "eu.timepit"             %% "refined"                  % "0.9.28",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
-      ("io.estatico"           %% "newtype"                  % "0.4.4").cross(CrossVersion.for3Use2_13)
+      ("io.estatico"           %% "newtype"                  % "0.4.4").cross(CrossVersion.for3Use2_13),
+      "org.typelevel"          %% "cats-core"                % "2.7.0"
     )
   )
