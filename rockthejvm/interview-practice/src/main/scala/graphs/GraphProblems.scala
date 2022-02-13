@@ -109,6 +109,28 @@ extension [T](graph: Graph[T])
 
     addOpposingEdges(graph.keySet, graph)
 
+  def color: Map[T, Int] =
+    def recurse(
+        remaining: List[T],
+        currentColor: Int = 0,
+        colors: Map[T, Int] = Map.empty
+    ): Map[T, Int] =
+      if remaining.isEmpty then colors
+      else
+        val currentNode = remaining.head
+        if colors.contains(currentNode) then recurse(remaining.tail, currentColor, colors)
+        else
+          val uncolored = remaining.tail.foldLeft[Set[T]](Set(currentNode)) { (acc, next) =>
+            val allAssociates = acc.flatMap(graph.undirectDan)
+            if colors.contains(next) || allAssociates.contains(next) then acc
+            else acc + next
+          }
+          recurse(remaining.tail, currentColor + 1, colors ++ uncolored.map((_, currentColor)))
+
+    val descending = graph.keySet.toList.sortWith((a, b) => outDegree(a) > outDegree(b))
+
+    recurse(descending)
+
 end extension
 
 object GraphProblems extends App:
@@ -130,10 +152,11 @@ object GraphProblems extends App:
     "David" -> Set("Bob", "Mary", "Alice", "Charlie")
   )
 
-  println(socialNetwork.outDegree("Alice")) // 3
-  println(socialNetwork.inDegree("David")) // 2
-  println(socialNetwork.isPath("Mary", "Alice")) // false
-  println(socialNetwork.findPath("Alice", "Mary")) // [Alice, David, Mary]
-  println(socialNetwork.findCycle("Charlie")) // [Charlie, David, Mary, Charlie]
-  println(socialNetwork.undirectG)
-  println(socialNetwork.undirectDan)
+  // println(socialNetwork.outDegree("Alice")) // 3
+  // println(socialNetwork.inDegree("David")) // 2
+  // println(socialNetwork.isPath("Mary", "Alice")) // false
+  // println(socialNetwork.findPath("Alice", "Mary")) // [Alice, David, Mary]
+  // println(socialNetwork.findCycle("Charlie")) // [Charlie, David, Mary, Charlie]
+  // println(socialNetwork.undirectG)
+  // println(socialNetwork.undirectDan)
+  println(socialNetwork.color)
