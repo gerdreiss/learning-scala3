@@ -35,9 +35,30 @@ extension [T](graph: Graph[T])
 
     // stack recursive, will probably result in a StackOverflowError if the graph is large enough
     // inDegree(to) > 0 && graph.get(from).exists(_.exists(ass => ass == to || isPath(ass, to)))
+    // calling the tail recursive method from above
     recurse(List(from))
+  end isPath
 
-  def findPath(from: T, to: T): Set[T] = ???
+  def findPath(from: T, to: T): List[T] =
+    @tailrec
+    def recurse(remaining: List[(T, List[T])], considered: Set[T] = Set.empty): List[T] =
+      if remaining.isEmpty then List.empty
+      else
+        val (currentNode, currentPath) = remaining.head
+        if currentNode == to then currentPath.reverse
+        else if considered.contains(currentNode) then
+          if currentNode == to then (currentNode :: currentPath).reverse
+          else recurse(remaining.tail, considered)
+        else
+          recurse(
+            remaining.tail ++ graph(currentNode).map(n => (n, n :: currentPath)),
+            considered + currentNode
+          )
+
+    recurse(graph(from).map(n => (n, n :: List(from))).toList, Set(from))
+  end findPath
+
+  def findCycle(node: T): List[T] = findPath(node, node)
 
 end extension
 
@@ -56,3 +77,5 @@ object GraphProblems extends App:
   println(socialNetwork.outDegree("Alice")) // 3
   println(socialNetwork.inDegree("David")) // 2
   println(socialNetwork.isPath("Mary", "Alice")) // false
+  println(socialNetwork.findPath("Alice", "Mary")) // [Alice, David, Mary]
+  println(socialNetwork.findCycle("Charlie")) // [Charlie, David, Mary, Charlie]
