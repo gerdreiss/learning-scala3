@@ -77,11 +77,9 @@ extension [T](graph: Graph[T])
   def findCycle(node: T): List[T] = findPath(node, node)
 
   def undirectG(using M: Monoid[Graph]): Graph[T] =
-    val undirected = graph.toList
+    val undirected = graph.toSet
       .flatMap((node, associates) => associates.map(_ -> node))
-      .groupBy(_._1)
-      .mapValues(_.map(_._2).toSet)
-      .toMap
+      .groupMap(_._1)(_._2)
     M.combine(graph, undirected)
 
   def undirectDan: Graph[T] =
@@ -157,6 +155,5 @@ object GraphProblems extends App:
   // println(socialNetwork.isPath("Mary", "Alice")) // false
   // println(socialNetwork.findPath("Alice", "Mary")) // [Alice, David, Mary]
   // println(socialNetwork.findCycle("Charlie")) // [Charlie, David, Mary, Charlie]
-  // println(socialNetwork.undirectG)
   // println(socialNetwork.undirectDan)
-  println(socialNetwork.color)
+  println(socialNetwork.undirectG)
