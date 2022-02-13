@@ -8,7 +8,23 @@ object Graph:
   def edge[T](a: T): Graph[T] = Map(a -> Set.empty)
   def node[T](a: T, associates: Set[T]) = Map(a -> associates)
   def from[T](associations: Map[T, Set[T]]): Graph[T] = associations
+  def associate[T](a: T, b: T): Graph[T] = node(a, Set(b))
 end Graph
+
+trait Monoid[F[_]]:
+  def empty[T]: F[T]
+  def combine[T](left: F[T], right: F[T]): F[T]
+
+given Monoid[Set] with
+  def empty[T]: Set[T] = Set.empty
+  def combine[T](left: Set[T], right: Set[T]): Set[T] = left ++ right
+
+given graphMonoid(using M: Monoid[Set]): Monoid[Graph] with
+  def empty[T]: Graph[T] = Graph.empty[T]
+  def combine[T](left: Graph[T], right: Graph[T]): Graph[T] =
+    left.foldLeft(empty) { case (acc, (node, associates)) =>
+      acc + (node -> M.combine(associates, right.get(node).getOrElse(Set.empty)))
+    }
 
 extension [T](graph: Graph[T])
   // number of nodes this node 'node' is associated (adjacent) to
@@ -60,6 +76,39 @@ extension [T](graph: Graph[T])
 
   def findCycle(node: T): List[T] = findPath(node, node)
 
+  def undirectG(using M: Monoid[Graph]): Graph[T] =
+    val undirected = graph.toList
+      .flatMap((node, associates) => associates.map(_ -> node))
+      .groupBy(_._1)
+      .mapValues(_.map(_._2).toSet)
+      .toMap
+    M.combine(graph, undirected)
+
+  def undirectDan: Graph[T] =
+    def addEdge(intermediate: Graph[T], from: T, to: T): Graph[T] =
+      // my variation of the Dan's implementation below
+      // graph ++ graph
+      //   .get(from)
+      //   .map(_ + to)
+      //   .fold(Graph.associate(from, to))(Graph.node(from, _))
+      // Dan's implementation
+      if graph.get(from).isEmpty then graph + (from -> Set(to))
+      else
+        val associates = graph(from)
+        graph + (from -> (associates + to))
+
+    def addOpposingEdges(remaining: Set[T], acc: Graph[T]): Graph[T] =
+      if remaining.isEmpty then acc
+      else
+        val currentNode = remaining.head
+        val associates = graph(currentNode)
+        val newGraph = associates.foldLeft(acc) { (intermediate, associate) =>
+          addEdge(intermediate, associate, currentNode)
+        }
+        addOpposingEdges(remaining.tail, newGraph)
+
+    addOpposingEdges(graph.keySet, graph)
+
 end extension
 
 object GraphProblems extends App:
@@ -73,9 +122,18 @@ object GraphProblems extends App:
       "Mary" -> Set("Bob", "Charlie")
     )
   )
+  val undirected = Map(
+    "Alice" -> Set("Bob", "Charlie", "David"),
+    "Bob" -> Set("Alice", "Mary", "David"),
+    "Charlie" -> Set("David", "Alice", "Mary"),
+    "Mary" -> Set("Bob", "Charlie", "David"),
+    "David" -> Set("Bob", "Mary", "Alice", "Charlie")
+  )
 
   println(socialNetwork.outDegree("Alice")) // 3
   println(socialNetwork.inDegree("David")) // 2
   println(socialNetwork.isPath("Mary", "Alice")) // false
   println(socialNetwork.findPath("Alice", "Mary")) // [Alice, David, Mary]
   println(socialNetwork.findCycle("Charlie")) // [Charlie, David, Mary, Charlie]
+  println(socialNetwork.undirectG)
+  println(socialNetwork.undirectDan)
