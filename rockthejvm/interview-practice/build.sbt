@@ -5,5 +5,6 @@ lazy val root = project
   .settings(
     name := "interview-practice",
     version := "0.1.0-SNAPSHOT",
-    scalaVersion := scala3Version
+    scalaVersion := scala3Version,
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0"
   )
