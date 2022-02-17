@@ -1,5 +1,5 @@
 val scala3Version   = "3.1.0"
-val doobieVersion   = "1.0.0-RC1"
+val doobieVersion   = "1.0.0-RC2"
 val monocleVersion  = "3.1.0"
 val typenameVersion = "1.0.0"
 val newTypeVersion  = "0.4.4"
