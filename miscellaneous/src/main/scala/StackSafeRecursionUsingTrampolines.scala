@@ -1,7 +1,8 @@
 // https://betterprogramming.pub/create-stack-safe-recursion-using-trampolines-in-scala-7c0ecd003fb9
-import scala.xml.dtd.ContentModel.Translator
+
 import scala.annotation.tailrec
-object StackSafeRecursionusingTrampolines extends App:
+
+object StackSafeRecursionUsingTrampolines extends App :
 
   def fib(n: Int): Int =
     if n == 0 then 0
@@ -19,13 +20,13 @@ object StackSafeRecursionusingTrampolines extends App:
   case class Suspense[A](a: () => Trampolining[A])                      extends Trampolining[A]
   case class FlatMap[A, B](a: Trampolining[A], f: A => Trampolining[B]) extends Trampolining[B]
 
-  def fibTailRef(n: Int): Trampolining[Int] =
+  def fibTailRec(n: Int): Trampolining[Int] =
     if n == 0 then Return[Int](0)
     else if n == 1 then Return[Int](1)
     else
       FlatMap[Int, Int](
-        Suspense(() => fibTailRef(n - 1)),
-        i => FlatMap[Int, Int](Suspense(() => fibTailRef(n - 2)), j => Return[Int](i + j))
+        Suspense(() => fibTailRec(n - 1)),
+        i => FlatMap[Int, Int](Suspense(() => fibTailRec(n - 2)), j => Return[Int](i + j))
       )
 
   @tailrec
@@ -40,4 +41,4 @@ object StackSafeRecursionusingTrampolines extends App:
           run(x1.flatMap((x2: Int) => f1(x2).flatMap(f): Trampolining[Int]))
 
   // this doesn't result in java.lang.StackOverflowError, but it takes forever
-  println(run(fibTailRef(1000)))
+  println(run(fibTailRec(1000)))
