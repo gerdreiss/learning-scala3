@@ -3,7 +3,7 @@ import cats.data.Validated.*
 import cats.implicits.*
 
 import scala.annotation.tailrec
-import scala.compiletime.ops.int
+import scala.collection.immutable.Queue
 import scala.util.Random
 
 object MovingAvg:
@@ -18,12 +18,12 @@ object MovingAvg:
 
   final class Input private (val numbers: List[Double], val window: Int):
     override def toString: String =
-      s"Input { numbers = ${numbers.mkString("[", ",", "]")}, window = $window }"
+      s"Input { window = $window, numbers = ${numbers.mkString("[", ",", "]")} }"
 
   object Input:
     import InputError.*
 
-    def create(numbers: List[Double], window: Int): ErrorsOr[Input] =
+    def make(numbers: List[Double], window: Int): ErrorsOr[Input] =
       (validateNumbers(numbers), validateWindow(window))
         .mapN(Input(_, _))
         .andThen(validateInput)
@@ -48,25 +48,37 @@ object MovingAvg:
   end Input
 
   def createInput(input: List[Double], window: Int): ErrorsOr[Input] =
-    Input.create(input, window)
+    Input.make(input, window)
 
   def compute(input: Input): List[Double] =
     @tailrec
     def recurse(
         remainingInput: List[Double],
         movingSum: Double,
-        acc: List[Double] = List.empty
-    ): List[Double] =
-      if remainingInput.length == input.window then movingSum / input.window :: acc
+        acc: Queue[Double] = Queue.empty
+    ): Queue[Double] =
+      if remainingInput.length == input.window then acc :+ movingSum / input.window
       else
         recurse(
           remainingInput.tail,
           movingSum - remainingInput.head + remainingInput(input.window),
-          movingSum / input.window :: acc
+          acc :+ movingSum / input.window
         )
 
-    recurse(input.numbers, input.numbers.take(input.window).sum).reverse
+    recurse(input.numbers, input.numbers.take(input.window).sum).toList
 
   end compute
 
 end MovingAvg
+
+@main def calculateMovingAvg(): Unit =
+  import MovingAvg.*
+
+  val rnd = new Random
+
+  val window  = rnd.nextInt(10)
+  val numbers = (1 to window * window + window / 3).map(_ => rnd.nextDouble).toList
+
+  Input.make(numbers, window) match
+    case Left(errors) => errors.foreach(println)
+    case Right(input) => println(compute(input))
