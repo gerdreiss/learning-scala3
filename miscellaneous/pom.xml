@@ -10,14 +10,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala-maven-plugin.version>4.5.6</scala-maven-plugin.version>
-        <scala-library.version>3.1.1</scala-library.version>
+        <scala.version>3.1.1</scala.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala3-library_3</artifactId>
-            <version>${scala-library.version}</version>
+            <version>${scala.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.timepit</groupId>
@@ -78,7 +78,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaVersion>${scala-library.version}</scalaVersion>
+                    <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
         </plugins>
