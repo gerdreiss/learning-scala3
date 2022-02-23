@@ -12,15 +12,15 @@ object StackSafeRecursionUsingTrampolines extends App :
   // this results in java.lang.StackOverflowError
   // val f = fib(100000)
 
-  sealed trait Trampolining[-A]:
-    def flatMap[B, C <: A](f: C => Trampolining[B]): Trampolining[B] = FlatMap(this, f)
-    def map[B, C <: A](f: C => B): Trampolining[B]                   = flatMap(f andThen (Return(_)))
+  sealed trait Trampoline[-A]:
+    def flatMap[B, C <: A](f: C => Trampoline[B]): Trampoline[B] = FlatMap(this, f)
+    def map[B, C <: A](f: C => B): Trampoline[B] = flatMap(f andThen (Return(_)))
 
-  case class Return[A](a: A)                                            extends Trampolining[A]
-  case class Suspense[A](a: () => Trampolining[A])                      extends Trampolining[A]
-  case class FlatMap[A, B](a: Trampolining[A], f: A => Trampolining[B]) extends Trampolining[B]
+  case class Return[A](a: A) extends Trampoline[A]
+  case class Suspense[A](a: () => Trampoline[A]) extends Trampoline[A]
+  case class FlatMap[A, B](a: Trampoline[A], f: A => Trampoline[B]) extends Trampoline[B]
 
-  def fibTailRec(n: Int): Trampolining[Int] =
+  def fibTailRec(n: Int): Trampoline[Int] =
     if n == 0 then Return[Int](0)
     else if n == 1 then Return[Int](1)
     else
@@ -30,15 +30,15 @@ object StackSafeRecursionUsingTrampolines extends App :
       )
 
   @tailrec
-  def run(trampoline: Trampolining[Int]): Int = trampoline match
-    case Return(a: Int)                                               => a
-    case Suspense(x: (() => Trampolining[Int]))                       => run(x())
-    case FlatMap(x: Trampolining[Int], f: (Int => Trampolining[Int])) =>
+  def run(trampoline: Trampoline[Int]): Int = trampoline match
+    case Return(a: Int) => a
+    case Suspense(x: (() => Trampoline[Int])) => run(x())
+    case FlatMap(x: Trampoline[Int], f: (Int => Trampoline[Int])) =>
       x match
-        case Return(a: Int)                                                 => run(f(a))
-        case Suspense(a: (() => Trampolining[Int]))                         => run(FlatMap(a(), f))
-        case FlatMap(x1: Trampolining[Int], f1: (Int => Trampolining[Int])) =>
-          run(x1.flatMap((x2: Int) => f1(x2).flatMap(f): Trampolining[Int]))
+        case Return(a: Int) => run(f(a))
+        case Suspense(a: (() => Trampoline[Int])) => run(FlatMap(a(), f))
+        case FlatMap(x1: Trampoline[Int], f1: (Int => Trampoline[Int])) =>
+          run(x1.flatMap((x2: Int) => f1(x2).flatMap(f): Trampoline[Int]))
 
   // this doesn't result in java.lang.StackOverflowError, but it takes forever
   println(run(fibTailRec(1000)))
