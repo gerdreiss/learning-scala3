@@ -73,6 +73,7 @@
                                 <arg>-unchecked</arg>
                                 <arg>-language:implicitConversions</arg>
                                 <arg>-language:postfixOps</arg>
+                                <arg>-language:strictEquality</arg>
                             </args>
                         </configuration>
                     </execution>
