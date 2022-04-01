@@ -18,11 +18,11 @@ object MovingAvgZIO:
   type Numbers = Numbers.Type
   type Window  = Window.Type
 
-  final class Input private (val numbers: Numbers, val window: Window)
+  sealed abstract case class Input private (val numbers: Numbers, val window: Window)
   object Input:
     def make(numbers: List[Double], window: Int): Either[List[String], Input] =
       Validation
-        .validateWith(Numbers.make(numbers), Window.make(window))(Input(_, _))
+        .validateWith(Numbers.make(numbers), Window.make(window))(new Input(_, _) {})
         .flatMap(input =>
           Validation.fromEither(
             Either.cond(
@@ -59,8 +59,8 @@ object MovingAvgZIO:
 
   val rnd = new Random
 
-  val window  = rnd.nextInt(10)
-  val numbers = (1 to window * window + window / 3).map(_ => rnd.nextDouble).toList
-  Input.make(numbers, 0) match
+  val window  = rnd.between(1, 10)
+  val numbers = (1 to window * window + window / 3).map(_ => rnd.between(0.001, 10.0)).toList
+  Input.make(numbers, window) match
     case Left(errors) => errors.foreach(println)
     case Right(input) => println(compute(input))
