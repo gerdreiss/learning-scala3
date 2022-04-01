@@ -33,7 +33,7 @@ object Debug:
         case e =>
           List(showWithValue(e))
 
-    val concatenatedStringsExp =
+    val concatenatedStringsExp: Expr[String] =
       stringExps.reduceOption((e1, e2) => '{ $e1 + ", " + $e2 }).getOrElse('{ "" })
 
     '{ println($concatenatedStringsExp) }
