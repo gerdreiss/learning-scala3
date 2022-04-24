@@ -23,7 +23,7 @@ lazy val root = project
       "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1",
       ("io.estatico"           %% "newtype"                  % "0.4.4").cross(CrossVersion.for3Use2_13),
       "org.typelevel"          %% "cats-core"                % "2.7.0",
-      "dev.zio"                %% "zio"                      % "2.0.0-RC3",
-      "dev.zio"                %% "zio-prelude"              % "1.0.0-RC11-2"
+      "dev.zio"                %% "zio"                      % "2.0.0-RC5",
+      "dev.zio"                %% "zio-prelude"              % "1.0.0-RC13"
     )
   )

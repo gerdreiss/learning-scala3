@@ -2,13 +2,13 @@ import zio.*
 import zio.prelude.*
 
 import scala.annotation.tailrec
-import scala.collection.immutable.Queue
 import scala.util.Random
 
 import Assertion.*
 
 object MovingAvgZIO:
 
+  /** it's probably best to use zio.NonEmptyChunk or zio.prelude.NonEmptyList instead, but here we are... */
   object Numbers extends Subtype[List[Double]]:
     override inline def assertion = Assertion.notEqualTo(List.empty)
 
@@ -40,7 +40,7 @@ object MovingAvgZIO:
     def recurse(
         remainingInput: List[Double],
         movingSum: Double,
-        acc: Queue[Double] = Queue.empty
+        acc: Vector[Double] = Vector.empty
     ): List[Double] =
       if remainingInput.length == input.window then (acc :+ movingSum / input.window).toList
       else
