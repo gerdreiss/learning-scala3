@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 import scala.util.Random
 
-object MovingAvg:
+object MovingAvgCats:
 
   type ErrorsOr[A]  = Either[List[InputError], A]
   type InvalidOr[A] = ValidatedNec[InputError, A]
@@ -69,10 +69,10 @@ object MovingAvg:
 
   end compute
 
-end MovingAvg
+end MovingAvgCats
 
 @main def calculateMovingAvg(): Unit =
-  import MovingAvg.*
+  import MovingAvgCats.*
 
   val rnd = new Random
 

@@ -1,4 +1,3 @@
-import zio.*
 import zio.prelude.*
 
 import scala.annotation.tailrec
@@ -6,7 +5,7 @@ import scala.util.Random
 
 import Assertion.*
 
-object MovingAvgZIO:
+object MovingAvgZioPrelude:
 
   /** it's probably best to use zio.NonEmptyChunk or zio.prelude.NonEmptyList instead, but here we are... */
   object Numbers extends Subtype[List[Double]]:
@@ -54,8 +53,10 @@ object MovingAvgZIO:
 
   end compute
 
+end MovingAvgZioPrelude
+
 @main def calculateMovingAvgWithZioPrelude(): Unit =
-  import MovingAvgZIO.*
+  import MovingAvgZioPrelude.*
 
   val rnd = new Random
 
