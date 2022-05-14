@@ -10,3 +10,11 @@
   import Debug.*
   debugSingle(x << y)
   debug("A", x, "B", y)
+
+  // everything in scala is an expression
+  var v = 10
+  val w =
+    while v > 0 do
+      v = v - 1
+      debug(v)
+  debug(w)
