@@ -4,9 +4,7 @@ import java.io.IOException
 
 object Util:
   def getExprElements(expr: String): List[String] =
-    expr.split(" ") match
-      case xs: Array[String] => xs.toList
-      case _                 => throw new IllegalStateException("WTF???")
+    expr.split(" ").nn.toList.map(_.nn) // is there a besser way?
 
 object UsingCatsStateA:
   import cats.data.*
